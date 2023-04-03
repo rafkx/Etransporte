@@ -1,0 +1,39 @@
+import { Fornecedor } from "src/fornecedor/entities/fornecedor.entity";
+import { Veiculo } from "src/veiculo/entities/veiculo.entity";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+
+@Entity()
+export class Peca {
+
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
+
+    @Column({ name: 'nome_peca', type: 'varchar', length: 50 })
+    nomePeca: string;
+
+    @Column({ name: 'codigo_peca', type: 'varchar', length: 50 })
+    codPeca: string;
+
+    @Column({ name: 'descricao', type: 'varchar', length: 500 })
+    descricao: string;
+
+    @Column({ name: 'marca_fabricante', type: 'varchar', length: 50 })
+    marcaFabricante: string;
+
+    @Column({ name: 'modelo', type: 'varchar', length: 50 })
+    modelo: string;
+
+    @ManyToMany(() => Peca)
+    @JoinTable()
+    pequenaPeca?: Peca[];
+
+    @ManyToOne(() => Fornecedor, (fornecedorP) => fornecedorP.peca, { eager: true })
+    fornecedorP: Fornecedor;
+
+    @ManyToMany(() => Veiculo)
+    @JoinTable()
+    veiculo: Veiculo[];
+}
