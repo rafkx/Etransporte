@@ -27,7 +27,7 @@ export class AbastecimentoController {
   @Roles(Role.Admin)
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: './files',
+      destination: './files/abastecimento',
       filename: (req, file, callback) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         const ext = extname(file.originalname);
