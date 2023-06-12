@@ -1,6 +1,8 @@
+import { Combustivel } from "src/combustivel/entities/combustivel.entity";
+import { FilesAbastecimento } from "src/files-abastecimento/entities/files-abastecimento.entity";
 import { Quilometro } from "src/quilometro/entities/quilometro.entity";
 import { Veiculo } from "src/veiculo/entities/veiculo.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Abastecimento {
@@ -10,9 +12,6 @@ export class Abastecimento {
 
     @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
     updatedAt: Date;
-
-    @Column({ name: 'tipo_combustivel', type: 'varchar', length: 50 })
-    tipoComb: string;
 
     @Column({ name: 'quantidade_litros', type: 'float' })
     quantLitros: number;
@@ -29,6 +28,9 @@ export class Abastecimento {
     @ManyToOne(() => Veiculo, (veiculo) => veiculo.abastecimento, { eager: true })
     veiculo: Veiculo;
 
+    @OneToMany(() => FilesAbastecimento, (files) => files.abastecimento)
+    files: FilesAbastecimento[];
+
     @OneToOne(() => Quilometro, {
         eager: true,
         cascade: true,
@@ -36,4 +38,12 @@ export class Abastecimento {
     })
     @JoinColumn()
     km: Quilometro;
+
+    @OneToOne(() => Combustivel, {
+        eager: true,
+        cascade: true,
+        onDelete: "CASCADE"
+    })
+    @JoinColumn()
+    combustivel: Combustivel;
 }

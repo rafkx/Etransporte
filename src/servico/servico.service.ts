@@ -14,16 +14,22 @@ export class ServicoService {
     return await this.repository.save(servico);
   }
 
-  findServicoByFornecedor(nome: string): Promise<Servico[]>{
+  findServico(text: string): Promise<Servico[]>{
     return this.repository.find({
       relations: {
-        fornecedor: true
+        fornecedor: true,
+        veiculo: true,
       },
-      where: {
-        fornecedor: {
-          nome: Like(`%${nome}%`)
-        },
-      },
+      where: [
+        { descricao: Like(`%${text}%`) },
+        { cod: Like(`%${text}%`) },
+        { veiculo: {
+          modelo: Like(`%${text}%`)
+        } },
+        { fornecedor: {
+          nome: Like(`%${text}%`)
+          } },
+      ],
     })
   }
 

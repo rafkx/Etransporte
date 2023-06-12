@@ -23,29 +23,13 @@ export class AbastecimentoController {
     return data;
   }
 
-  @Post('file')
-  @Roles(Role.Admin)
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './files/abastecimento',
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = extname(file.originalname);
-        const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
-        callback(null, filename);
-      }
-    })
-  }))
-  handleUpload(@UploadedFile() file: Express.Multer.File) {
-    return { filePath: file.path }
-  }
-
   @Get('filter')
   @Roles(Role.Admin)
-  filter(@Query('data') data: any) {
-    return this.abastecimentoService.findAbastecimentoByDate({
-      data: data
-    })
+  filter(@Query('data') data: any, @Query('text') text: string) {
+    return this.abastecimentoService.findAbastecimentoByDate(
+      data,
+      text,
+    )
   }
 
   @Get()

@@ -45,10 +45,8 @@ export class VeiculoController {
 
   @Get('filter')
   @Roles(Role.Admin)
-  filter(@Query('placa') placa: string) {
-    return this.veiculoService.findVeiculoByPlaca({
-      placa: placa
-    })
+  filter(@Query('ano') ano: number, @Query('text') text: string) {
+    return this.veiculoService.findVeiculoByPlaca(ano, text)
   }
 
   @Get()

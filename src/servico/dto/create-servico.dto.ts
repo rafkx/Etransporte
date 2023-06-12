@@ -7,6 +7,10 @@ export class CreateServicoDto {
     @IsString()
     @IsNotEmpty()
     descricao: string;
+
+    @IsString()
+    @IsNotEmpty()
+    cod: string;
     
     fornecedor: Fornecedor;
 

@@ -42,10 +42,11 @@ export class QuilometroController {
 
   @Get('filter')
   @Roles(Role.Admin)
-  filter(@Query('data') data: any) {
-    return this.quilometroService.findKmByDate({
-      data: data
-    })
+  filter(@Query('data') data: any, @Query('text') text: string) {
+    return this.quilometroService.findKmByDate(
+      data,
+      text,
+    )
   }
 
   @Get()

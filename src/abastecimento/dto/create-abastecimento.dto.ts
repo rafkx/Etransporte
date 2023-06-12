@@ -4,9 +4,6 @@ import { Veiculo } from "src/veiculo/entities/veiculo.entity";
 
 export class CreateAbastecimentoDto {
     
-    @IsString()
-    @IsNotEmpty()
-    tipoComb: string;
     
     @IsNumber()
     @Min(1)

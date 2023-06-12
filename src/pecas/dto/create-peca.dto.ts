@@ -1,7 +1,8 @@
-import { IsIn, IsInt, IsNotEmpty, IsObject, IsOptional, isString, IsString, Min } from "class-validator";
+import { IsIn, IsInt, IsNotEmpty, IsObject, IsOptional, isString, IsString, Min, Validator } from "class-validator";
 import { Fornecedor } from "src/fornecedor/entities/fornecedor.entity";
 import { Veiculo } from "src/veiculo/entities/veiculo.entity";
 import { Peca } from "../entities/peca.entity";
+import { Unique } from "typeorm";
 
 export class CreatePecaDto {
     

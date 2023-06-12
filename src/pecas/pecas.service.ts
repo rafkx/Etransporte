@@ -14,11 +14,19 @@ export class PecasService {
     return this.repository.save(peca);
   }
 
-  findPecaByName(peca: Partial<Peca>): Promise<Peca[]> {
+  findPecaByName(text: string): Promise<Peca[]> {
     return this.repository.find({
-      where: {
-        nomePeca: Like(`%${peca.nomePeca}%`)
-      }
+      relations: {
+        fornecedorP: true
+      },
+      where: [
+        { nomePeca: Like(`%${text}%`) },
+        { descricao: Like(`%${text}%`) },
+        { codPeca: Like(`%${text}%`) },
+        { fornecedorP: {
+          nome: Like(`%${text}%`)
+        } }
+      ]
     })
   }
 

@@ -11,6 +11,9 @@ export class Servico {
     @Column({ name: 'descricao', type: 'varchar', length: 500 })
     descricao: string;
 
+    @Column({ name: 'cod', type: 'varchar', length: 50, unique: true })
+    cod: string;
+
     @ManyToOne(() => Fornecedor, (fornecedor) => fornecedor.servicos, { eager: true })
     fornecedor: Fornecedor;
 

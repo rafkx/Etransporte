@@ -14,10 +14,17 @@ export class QuilometroService {
     return this.repository.save(quilometro);
   }
 
-  findKmByDate(km: Partial<Quilometro>): Promise<Quilometro[]> {
-    return this.repository.findBy(
-      { data: Raw((alias) => `${alias} = :date`, { date: km.data }) }
-    )
+  findKmByDate(date: Date, text: string): Promise<Quilometro[]> {
+    const queryBuilder = this.repository.createQueryBuilder('quilometro');
+    queryBuilder.leftJoinAndSelect('quilometro.veiculo', 'veiculo');
+    if (date) {
+      queryBuilder.andWhere('DATE(quilometro.data) = :date', { date });
+    }
+
+    if (text) {
+      queryBuilder.andWhere('veiculo.placa LIKE :text', { text: `%${text}%` })
+    }
+    return queryBuilder.getMany();
   }
 
   findAll(): Promise<Quilometro[]> {

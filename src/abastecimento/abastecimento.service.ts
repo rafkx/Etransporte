@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Raw, Repository } from 'typeorm';
+import { FindOptionsWhere, Like, Raw, Repository } from 'typeorm';
 import { CreateAbastecimentoDto } from './dto/create-abastecimento.dto';
 import { UpdateAbastecimentoDto } from './dto/update-abastecimento.dto';
 import { Abastecimento } from './entities/abastecimento.entity';
@@ -14,10 +14,65 @@ export class AbastecimentoService {
     return this.repository.save(abastecimento);
   }
 
-  findAbastecimentoByDate(abastecimento: Partial<Abastecimento>): Promise<Abastecimento[]> {
-    return this.repository.findBy(
-      { data: Raw((alias) => `${alias} = :date`, { date: abastecimento.data }) }
-    )
+  findAbastecimentoByDate(date: Date, text: string): Promise<Abastecimento[]> {
+    const queryBuilder = this.repository.createQueryBuilder('abastecimento');
+    queryBuilder.leftJoinAndSelect('abastecimento.veiculo', 'veiculo');
+    if (date) {
+      queryBuilder.andWhere('DATE(abastecimento.data) = :date', { date });
+    }
+
+    if (text) {
+      queryBuilder.andWhere('abastecimento.tipo_combustivel LIKE :text', { text: `%${text}%` })
+      .orWhere('veiculo.placa LIKE :text', { text: `%${text}%` })
+    }
+    
+    return queryBuilder.getMany();
+    
+    /*if (date != null && text != null) {
+      return this.repository.find({
+        relations: {
+          veiculo: true
+        },
+        where: [
+          { tipoComb: Like(`%${text}%`), data: Raw((alias) => `${alias} = :date`, { date: date }) },
+          { veiculo: {
+              placa: Like(`%${text}%`) 
+            }, data: Raw((alias) => `${alias} = :date`, { date: date })
+          }
+        ]
+      })
+    } */
+    
+    /*let where: FindOptionsWhere<Abastecimento>[] = [];
+    
+    if(text && text !== null) {
+      return this.repository.find({
+      relations: {
+          veiculo: true
+      },
+      where: [
+        { tipoComb: Like(`%${text}%`) },
+        { veiculo: {
+          placa: Like(`%${text}%`) 
+        } }
+      ]
+      })
+      where =  [
+        { tipoComb: Like(`%${text}%`) },
+        { veiculo: {
+          placa: Like(`%${text}%`) 
+        } }
+      ];
+    } else if (date && date !== null) {
+      //return this.repository.findBy({ data: Raw((alias) => `${alias} = :date`, { date: date }) })
+      where.push({ data: Raw((alias) => `${alias} = :date`, { date: date })});
+    }
+    return this.repository.find({
+        relations: {
+          veiculo: true
+      },
+      where
+      });*/
   }
 
   findAll(): Promise<Abastecimento[]> {

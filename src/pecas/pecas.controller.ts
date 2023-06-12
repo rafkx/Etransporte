@@ -24,32 +24,10 @@ export class PecasController {
     return data;
   }
 
-  @Post('file')
-  @Roles(Role.Admin)
-  @UseInterceptors(FileFieldsInterceptor([
-    { name: 'image', maxCount: 1 },
-    { name: 'file', maxCount: 1 },
-  ], {
-    storage: diskStorage({
-      destination: './files/peca', 
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = extname(file.originalname);
-        const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
-        callback(null, filename)
-      }
-    })
-  }))
-  handleUpload(@UploadedFiles() files: { image?: Express.Multer.File[], file?: Express.Multer.File[] }) {
-    return files;
-  }
-
   @Get('filter')
   @Roles(Role.Admin)
-  fiter(@Query('nomePeca') nomePeca: string) {
-    return this.pecasService.findPecaByName({
-      nomePeca: nomePeca
-    })
+  fiter(@Query('text') text: string) {
+    return this.pecasService.findPecaByName(text)
     
   }
 

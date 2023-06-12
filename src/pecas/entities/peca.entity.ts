@@ -1,6 +1,7 @@
+import { FilesPeca } from "src/files-peca/entities/files-peca.entity";
 import { Fornecedor } from "src/fornecedor/entities/fornecedor.entity";
 import { Veiculo } from "src/veiculo/entities/veiculo.entity";
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Peca {
@@ -14,7 +15,7 @@ export class Peca {
     @Column({ name: 'nome_peca', type: 'varchar', length: 50 })
     nomePeca: string;
 
-    @Column({ name: 'codigo_peca', type: 'varchar', length: 50 })
+    @Column({ name: 'codigo_peca', type: 'varchar', length: 50, unique: true })
     codPeca: string;
 
     @Column({ name: 'descricao', type: 'varchar', length: 500 })
@@ -36,4 +37,8 @@ export class Peca {
     @ManyToMany(() => Veiculo)
     @JoinTable()
     veiculo: Veiculo[];
+
+    @OneToMany(() => FilesPeca, (files) => files.peca)
+    files: FilesPeca[];
+
 }

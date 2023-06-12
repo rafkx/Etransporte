@@ -45,8 +45,8 @@ export class ServicoController {
 
   @Get('filter')
   @Roles(Role.Admin)
-  filter(@Query('nome') nome: string){
-    return this.servicoService.findServicoByFornecedor(nome)
+  filter(@Query('text') text: string){
+    return this.servicoService.findServico(text)
   }
 
   @Get()

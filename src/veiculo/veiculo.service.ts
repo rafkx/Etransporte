@@ -14,12 +14,20 @@ export class VeiculoService {
     return this.repository.save(veiculo);
   }
 
-  findVeiculoByPlaca(veiculo: Partial<Veiculo>): Promise<Veiculo[]> {
-    return this.repository.find({
-      where: {
-        placa: Like(`%${veiculo.placa}%`)
-      }
-    })
+  findVeiculoByPlaca(ano: number, text: string): Promise<Veiculo[]> {
+    const queryBuilder = this.repository.createQueryBuilder('veiculo');
+    
+    if (ano) {
+      queryBuilder.andWhere('veiculo.ano = :ano', { ano })
+    }
+
+    if (text) {
+      queryBuilder.andWhere('veiculo.placa LIKE :text', { text: `%${text}%` })
+      .orWhere('veiculo.marca LIKE :text', { text: `%${text}%` })
+      .orWhere('veiculo.modelo LIKE :text', { text: `%${text}%` })
+    }
+
+    return queryBuilder.getMany();
   }
 
   findAll(): Promise<Veiculo[]> {
