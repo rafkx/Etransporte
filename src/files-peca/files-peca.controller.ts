@@ -1,14 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles, UseInterceptors, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles, UseInterceptors, Req, StreamableFile } from '@nestjs/common';
 import { FilesPecaService } from './files-peca.service';
 import { CreateFilesPecaDto } from './dto/create-files-peca.dto';
 import { UpdateFilesPecaDto } from './dto/update-files-peca.dto';
 import { JwtAuth } from 'src/decorators/jwt.auth.decorator';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
 import { Request } from 'express';
+import { FilesPeca } from './entities/files-peca.entity';
 
 @Controller('files-peca')
 @JwtAuth()
@@ -18,8 +19,7 @@ export class FilesPecaController {
   @Post()
   @Roles(Role.Admin)
   @UseInterceptors(FileFieldsInterceptor([
-    { name: 'image', maxCount: 1 },
-    { name: 'file', maxCount: 1 },
+    { name: 'file', maxCount: 2 },
   ], {
     storage: diskStorage({
       destination: './files/peca', 
@@ -32,29 +32,28 @@ export class FilesPecaController {
     })
   }))
   handleUpload(
-    @UploadedFiles() 
-    files: { image?: Express.Multer.File[], file?: Express.Multer.File[] },
-    @Req() req: Request) {
-    return this.filesPecaService.salvarDados(files['image, file'], req);
+    @UploadedFiles() files: { file?: Express.Multer.File[] },
+    @Body() createFilesPecaDto: CreateFilesPecaDto,
+    @Req() req: Request
+    ): Promise<FilesPeca[]> {
+    return this.filesPecaService.salvarDados(files['file'], createFilesPecaDto, req);
   }
 
-  @Get()
-  findAll() {
-    return this.filesPecaService.findAll();
+  @Get('download/:fileName')
+  @Roles(Role.Admin)
+  download(@Param('fileName') fileName: string): StreamableFile {
+    return this.filesPecaService.download(fileName);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.filesPecaService.findOne(+id);
+  @Roles(Role.Admin)
+  findAll(@Param('id') id: string) {
+    return this.filesPecaService.findAll(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFilesPecaDto: UpdateFilesPecaDto) {
-    return this.filesPecaService.update(+id, updateFilesPecaDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.filesPecaService.remove(+id);
+  @Delete(':fileName')
+  @Roles(Role.Admin)
+  remove(@Param('fileName') fileName: string) {
+    return this.filesPecaService.remove(fileName);
   }
 }

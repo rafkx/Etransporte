@@ -4,6 +4,11 @@ import { Like, Repository } from 'typeorm';
 import { CreatePecaDto } from './dto/create-peca.dto';
 import { UpdatePecaDto } from './dto/update-peca.dto';
 import { Peca } from './entities/peca.entity';
+import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
+import { Observable, from, map } from 'rxjs';
+import { PageDto } from 'src/DTOs/page.dto';
+import { PageOptionsDto } from 'src/dtos/page-options.dto';
+import { PageMetaDto } from 'src/DTOs/page-meta.dto';
 
 @Injectable()
 export class PecasService {
@@ -14,24 +19,43 @@ export class PecasService {
     return this.repository.save(peca);
   }
 
-  findPecaByName(text: string): Promise<Peca[]> {
-    return this.repository.find({
-      relations: {
-        fornecedorP: true
-      },
-      where: [
-        { nomePeca: Like(`%${text}%`) },
-        { descricao: Like(`%${text}%`) },
-        { codPeca: Like(`%${text}%`) },
-        { fornecedorP: {
-          nome: Like(`%${text}%`)
-        } }
-      ]
-    })
+  async findPecaByName(text: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Peca>> {
+    const queryBuilder = this.repository.createQueryBuilder('pecas');
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+    queryBuilder.leftJoinAndSelect('pecas.fornecedorP', 'fornecedorP');
+
+    if (text) {
+      queryBuilder.where('pecas.nomePeca LIKE :text', { text: `%${text}%` })
+      .orWhere('pecas.descricao LIKE :text', { text: `%${text}%` })
+      .orWhere('pecas.codPeca LIKE :text', { text: `%${text}%` })
+      .orWhere('fornecedorP.nome LIKE :text', { text: `%${text}%` })
+    }
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto })
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
+  async paginate(pageOptionsDto: PageOptionsDto): Promise<PageDto<Peca>> {
+    const queryBuilder = this.repository.createQueryBuilder('pecas');
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+    queryBuilder.leftJoinAndSelect('pecas.fornecedorP', 'fornecedorP');
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
   }
 
   findAll(): Promise<Peca[]> {
-    return this.repository.find({ relations: ['veiculo'] });
+    return this.repository.find();
   }
 
   findOne(id: string): Promise<Peca> {

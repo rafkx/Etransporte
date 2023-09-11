@@ -1,7 +1,8 @@
 import { type } from "os";
 import { Abastecimento } from "src/abastecimento/entities/abastecimento.entity";
+import { FilesQuilometro } from "src/files-quilometro/entities/files-quilometro.entity";
 import { Veiculo } from "src/veiculo/entities/veiculo.entity";
-import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Quilometro {
@@ -20,4 +21,7 @@ export class Quilometro {
 
     @ManyToOne(() => Veiculo, (veiculo) => veiculo.km, { eager: true })
     veiculo: Veiculo;
+
+    @OneToMany(() => FilesQuilometro, (files) => files.quilometro)
+    files: FilesQuilometro[];
 }

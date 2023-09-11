@@ -39,11 +39,6 @@ export class Abastecimento {
     @JoinColumn()
     km: Quilometro;
 
-    @OneToOne(() => Combustivel, {
-        eager: true,
-        cascade: true,
-        onDelete: "CASCADE"
-    })
-    @JoinColumn()
+    @ManyToOne(() => Combustivel, (combustivel) => combustivel.abastecimento, { eager: true })
     combustivel: Combustivel;
 }

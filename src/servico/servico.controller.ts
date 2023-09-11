@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, UseInterceptors, UploadedFiles, ClassSerializerInterceptor } from '@nestjs/common';
 import { ServicoService } from './servico.service';
 import { CreateServicoDto } from './dto/create-servico.dto';
 import { UpdateServicoDto } from './dto/update-servico.dto';
@@ -9,8 +9,13 @@ import { Role } from 'src/enums/role.enum';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { Observable } from 'rxjs';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { Servico } from './entities/servico.entity';
+import { PageOptionsDto } from 'src/dtos/page-options.dto';
 
 @Controller('servico')
+@UseInterceptors(ClassSerializerInterceptor)
 @JwtAuth()
 export class ServicoController {
   constructor(private readonly servicoService: ServicoService) {}
@@ -23,30 +28,19 @@ export class ServicoController {
     return data;
   }
 
-  @Post('file')
-  @Roles(Role.Admin)
-  @UseInterceptors(FileFieldsInterceptor([
-    { name: 'image', maxCount: 1 },
-    { name: 'file', maxCount: 1 }
-  ], {
-    storage: diskStorage({
-      destination: './files/servico',
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = extname(file.originalname);
-        const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
-        callback(null, filename)
-      }
-    })
-  }))
-  handleUpload(@UploadedFiles() files: { image?: Express.Multer.File[], file?: Express.Multer.File[] }) {
-    return files;
-  }
-
   @Get('filter')
   @Roles(Role.Admin)
-  filter(@Query('text') text: string){
-    return this.servicoService.findServico(text)
+  filter(
+    @Query('text') text: string,
+    @Query() pageOptionsDto: PageOptionsDto
+    ) {
+    return this.servicoService.findServico(text, pageOptionsDto);
+  }
+
+  @Get('paginate')
+  @Roles(Role.Admin)
+  paginate(@Query() pageOptionsDto: PageOptionsDto) {
+    return this.servicoService.paginate(pageOptionsDto);
   }
 
   @Get()

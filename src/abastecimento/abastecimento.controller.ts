@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseInterceptors, UploadedFile, Query, ClassSerializerInterceptor } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -9,8 +9,10 @@ import { Role } from 'src/enums/role.enum';
 import { AbastecimentoService } from './abastecimento.service';
 import { CreateAbastecimentoDto } from './dto/create-abastecimento.dto';
 import { UpdateAbastecimentoDto } from './dto/update-abastecimento.dto';
+import { PageOptionsDto } from 'src/dtos/page-options.dto';
 
 @Controller('abastecimento')
+@UseInterceptors(ClassSerializerInterceptor)
 @JwtAuth()
 export class AbastecimentoController {
   constructor(private readonly abastecimentoService: AbastecimentoService) {}
@@ -25,11 +27,22 @@ export class AbastecimentoController {
 
   @Get('filter')
   @Roles(Role.Admin)
-  filter(@Query('data') data: any, @Query('text') text: string) {
+  filter(
+    @Query('data') data: Date, 
+    @Query('text') text: string,
+    @Query() pageOptionsDto: PageOptionsDto,
+    ) {
     return this.abastecimentoService.findAbastecimentoByDate(
       data,
       text,
+      pageOptionsDto
     )
+  }
+
+  @Get('paginate')
+  @Roles(Role.Admin)
+  paginate(@Query() pageOptionsDto: PageOptionsDto,) {
+    return this.abastecimentoService.paginate(pageOptionsDto);
   }
 
   @Get()

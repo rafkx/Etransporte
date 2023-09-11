@@ -1,4 +1,5 @@
 import { IsBoolean, IsDate, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
+import { Funcionario } from "src/funcionario/entities/funcionario.entity";
 
 export class CreateVeiculoDto {
     
@@ -97,4 +98,6 @@ export class CreateVeiculoDto {
     @IsString()
     @IsNotEmpty()
     descricao: string;
+
+    funcionario?: Funcionario;
 }

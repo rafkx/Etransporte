@@ -34,7 +34,7 @@ export class Peca {
     @ManyToOne(() => Fornecedor, (fornecedorP) => fornecedorP.peca, { eager: true })
     fornecedorP: Fornecedor;
 
-    @ManyToMany(() => Veiculo)
+    @ManyToMany(() => Veiculo, { eager: true })
     @JoinTable()
     veiculo: Veiculo[];
 

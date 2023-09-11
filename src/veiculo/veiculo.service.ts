@@ -4,6 +4,11 @@ import { Like, Repository } from 'typeorm';
 import { CreateVeiculoDto } from './dto/create-veiculo.dto';
 import { UpdateVeiculoDto } from './dto/update-veiculo.dto';
 import { Veiculo } from './entities/veiculo.entity';
+import { Observable, from, map } from 'rxjs';
+import { IPaginationOptions, Pagination, paginate, paginateRawAndEntities } from 'nestjs-typeorm-paginate';
+import { PageOptionsDto } from 'src/dtos/page-options.dto';
+import { PageDto } from 'src/DTOs/page.dto';
+import { PageMetaDto } from 'src/DTOs/page-meta.dto';
 
 @Injectable()
 export class VeiculoService {
@@ -14,20 +19,55 @@ export class VeiculoService {
     return this.repository.save(veiculo);
   }
 
-  findVeiculoByPlaca(ano: number, text: string): Promise<Veiculo[]> {
+  async findVeiculoByPlaca(ano: number, text: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Veiculo>> {
     const queryBuilder = this.repository.createQueryBuilder('veiculo');
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+
+    if (ano && text) {
+      queryBuilder.where('veiculo.ano = :ano', { ano });
+      queryBuilder.andWhere('veiculo.placa LIKE :text', { text: `%${text}%` })
+      .orWhere('veiculo.marca LIKE :text', { text: `%${text}%` })
+      .orWhere('veiculo.modelo LIKE :text', { text: `%${text}%` });
+    }
     
     if (ano) {
-      queryBuilder.andWhere('veiculo.ano = :ano', { ano })
+      queryBuilder.where('veiculo.ano = :ano', { ano });
     }
 
     if (text) {
-      queryBuilder.andWhere('veiculo.placa LIKE :text', { text: `%${text}%` })
+      queryBuilder.where('veiculo.placa LIKE :text', { text: `%${text}%` })
       .orWhere('veiculo.marca LIKE :text', { text: `%${text}%` })
-      .orWhere('veiculo.modelo LIKE :text', { text: `%${text}%` })
+      .orWhere('veiculo.modelo LIKE :text', { text: `%${text}%` });
     }
 
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
+  findVeiculoByFuncionario(id: string): Promise<Veiculo[]> {
+    const queryBuilder = this.repository.createQueryBuilder('veiculo');
+    queryBuilder.leftJoinAndSelect('veiculo.funcionario', 'funcionario');
+    queryBuilder.where('funcionario.id = :id', { id });
+
     return queryBuilder.getMany();
+  }
+
+  async paginate(pageOptionsDto: PageOptionsDto): Promise<PageDto<Veiculo>> {
+    const queryBuilder = this.repository.createQueryBuilder('veiculo');
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
   }
 
   findAll(): Promise<Veiculo[]> {

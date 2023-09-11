@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Abastecimento } from "src/abastecimento/entities/abastecimento.entity";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Combustivel extends BaseEntity {
@@ -10,4 +11,7 @@ export class Combustivel extends BaseEntity {
 
     @Column({ name: 'nome', type: 'varchar', length: 50 })
     nome: string;
+
+    @OneToMany(() => Abastecimento, (abastecimentos) => abastecimentos.combustivel)
+    abastecimento: Abastecimento[]; 
 }

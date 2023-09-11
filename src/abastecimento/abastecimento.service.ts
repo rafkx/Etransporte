@@ -4,6 +4,12 @@ import { FindOptionsWhere, Like, Raw, Repository } from 'typeorm';
 import { CreateAbastecimentoDto } from './dto/create-abastecimento.dto';
 import { UpdateAbastecimentoDto } from './dto/update-abastecimento.dto';
 import { Abastecimento } from './entities/abastecimento.entity';
+import { IPaginationMeta, IPaginationOptions, Pagination, paginate, paginateRawAndEntities } from 'nestjs-typeorm-paginate';
+import { Observable, from, map } from 'rxjs';
+import { query } from 'express';
+import { PageOptionsDto } from 'src/dtos/page-options.dto';
+import { PageDto } from 'src/DTOs/page.dto';
+import { PageMetaDto } from 'src/DTOs/page-meta.dto';
 
 @Injectable()
 export class AbastecimentoService {
@@ -14,65 +20,47 @@ export class AbastecimentoService {
     return this.repository.save(abastecimento);
   }
 
-  findAbastecimentoByDate(date: Date, text: string): Promise<Abastecimento[]> {
+  async findAbastecimentoByDate(date: Date, text: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Abastecimento>> { 
     const queryBuilder = this.repository.createQueryBuilder('abastecimento');
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
     queryBuilder.leftJoinAndSelect('abastecimento.veiculo', 'veiculo');
-    if (date) {
+    
+    if (date && text) {
+      queryBuilder.where('veiculo.placa LIKE :text', { text: `%${text}%` });
       queryBuilder.andWhere('DATE(abastecimento.data) = :date', { date });
     }
 
+    if (date) {
+      queryBuilder.where('DATE(abastecimento.data) = :date', { date });
+    }
+
     if (text) {
-      queryBuilder.andWhere('abastecimento.tipo_combustivel LIKE :text', { text: `%${text}%` })
-      .orWhere('veiculo.placa LIKE :text', { text: `%${text}%` })
+      queryBuilder.where('veiculo.placa LIKE :text', { text: `%${text}%` });
     }
-    
-    return queryBuilder.getMany();
-    
-    /*if (date != null && text != null) {
-      return this.repository.find({
-        relations: {
-          veiculo: true
-        },
-        where: [
-          { tipoComb: Like(`%${text}%`), data: Raw((alias) => `${alias} = :date`, { date: date }) },
-          { veiculo: {
-              placa: Like(`%${text}%`) 
-            }, data: Raw((alias) => `${alias} = :date`, { date: date })
-          }
-        ]
-      })
-    } */
-    
-    /*let where: FindOptionsWhere<Abastecimento>[] = [];
-    
-    if(text && text !== null) {
-      return this.repository.find({
-      relations: {
-          veiculo: true
-      },
-      where: [
-        { tipoComb: Like(`%${text}%`) },
-        { veiculo: {
-          placa: Like(`%${text}%`) 
-        } }
-      ]
-      })
-      where =  [
-        { tipoComb: Like(`%${text}%`) },
-        { veiculo: {
-          placa: Like(`%${text}%`) 
-        } }
-      ];
-    } else if (date && date !== null) {
-      //return this.repository.findBy({ data: Raw((alias) => `${alias} = :date`, { date: date }) })
-      where.push({ data: Raw((alias) => `${alias} = :date`, { date: date })});
-    }
-    return this.repository.find({
-        relations: {
-          veiculo: true
-      },
-      where
-      });*/
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
+  async paginate(pageOptionsDto: PageOptionsDto): Promise<PageDto<Abastecimento>> {
+    const queryBuilder = this.repository.createQueryBuilder('abastecimento');
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+    queryBuilder.leftJoinAndSelect('abastecimento.veiculo', 'veiculo');
+    queryBuilder.leftJoinAndSelect('abastecimento.km', 'km');
+    queryBuilder.leftJoinAndSelect('abastecimento.combustivel', 'combustivel');
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
   }
 
   findAll(): Promise<Abastecimento[]> {

@@ -1,6 +1,7 @@
-import { BeforeInsert, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BeforeInsert, Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { hashSync } from 'bcrypt';
 import { Role } from "src/enums/role.enum";
+import { Funcionario } from "src/funcionario/entities/funcionario.entity";
 
 @Entity()
 export class UserWeb {
@@ -28,6 +29,14 @@ export class UserWeb {
 
     @DeleteDateColumn({ name: 'delete_At' })
     deleteAt: string;
+
+    @OneToOne(() => Funcionario, {
+        eager: true,
+        cascade: true, 
+        onDelete: "CASCADE"
+    })
+    @JoinColumn()
+    funcionario: Funcionario;
     
     static role: any;
 

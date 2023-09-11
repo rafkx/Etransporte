@@ -1,4 +1,6 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { FilesFuncionario } from "src/files-funcionario/entities/files-funcionario.entity";
+import { Veiculo } from "src/veiculo/entities/veiculo.entity";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Funcionario extends BaseEntity {
@@ -82,4 +84,10 @@ export class Funcionario extends BaseEntity {
 
     @Column({ name: 'estadoCarteiraTrab', type: 'varchar', nullable: true, length: 100 })
     estadoCarteiraTrab?: string;
+
+    @OneToMany(() => FilesFuncionario, (files) => files.funcionario)
+    files: FilesFuncionario[];
+
+    @OneToMany(() => Veiculo, (veiculo) => veiculo.funcionario)
+    veiculos: Veiculo[];
 }

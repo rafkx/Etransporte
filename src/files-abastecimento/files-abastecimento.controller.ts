@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, Req, StreamableFile } from '@nestjs/common';
 import { FilesAbastecimentoService } from './files-abastecimento.service';
 import { CreateFilesAbastecimentoDto } from './dto/create-files-abastecimento.dto';
 import { UpdateFilesAbastecimentoDto } from './dto/update-files-abastecimento.dto';
@@ -9,6 +9,7 @@ import { extname } from 'path';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
 import { Request } from 'express';
+import { FilesAbastecimento } from './entities/files-abastecimento.entity';
 
 @Controller('files-abastecimento')
 @JwtAuth()
@@ -28,27 +29,28 @@ export class FilesAbastecimentoController {
       }
     })
   }))
-  handleUpload(@UploadedFile() file: Express.Multer.File, @Req() req: Request) {
-    return this.filesAbastecimentoService.salvarDados(file, req);
+  handleUpload(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createFilesAbestecimentoDto: CreateFilesAbastecimentoDto, 
+    @Req() req: Request): Promise<FilesAbastecimento[]> {
+    return this.filesAbastecimentoService.salvarDados(file, createFilesAbestecimentoDto, req);
   }
 
-  @Get()
-  findAll() {
-    return this.filesAbastecimentoService.findAll();
+  @Get('download/:fileName')
+  @Roles(Role.Admin)
+  download(@Param('fileName') fileName: string): StreamableFile {
+    return this.filesAbastecimentoService.download(fileName);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.filesAbastecimentoService.findOne(+id);
+  @Roles(Role.Admin)
+  findAll(@Param('id') id: string) {
+    return this.filesAbastecimentoService.findAll(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFilesAbastecimentoDto: UpdateFilesAbastecimentoDto) {
-    return this.filesAbastecimentoService.update(+id, updateFilesAbastecimentoDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.filesAbastecimentoService.remove(+id);
+  @Delete(':fileName')
+  @Roles(Role.Admin)
+  remove(@Param('fileName') fileName: string) {
+    return this.filesAbastecimentoService.remove(fileName);
   }
 }

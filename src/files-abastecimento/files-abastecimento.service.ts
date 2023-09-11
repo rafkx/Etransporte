@@ -1,42 +1,58 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import { CreateFilesAbastecimentoDto } from './dto/create-files-abastecimento.dto';
-import { UpdateFilesAbastecimentoDto } from './dto/update-files-abastecimento.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilesAbastecimento } from './entities/files-abastecimento.entity';
 import { Repository } from 'typeorm';
 import { Request } from 'express';
+import * as fs from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class FilesAbastecimentoService {
   constructor(@InjectRepository(FilesAbastecimento) private readonly repository: Repository<FilesAbastecimento>) { }
 
-  async salvarDados(file: Express.Multer.File, req: Request) {
-    const arquivo = new FilesAbastecimento();
-    arquivo.fileName = file.filename;
-    arquivo.contentLenght = file.size;
-    arquivo.contentType = file.mimetype;
-    arquivo.url = `${req.protocol}://${req.get('host')}/files/abastecimento/${file.filename}`;
-
-    return await this.repository.save(arquivo);
+  async salvarDados(
+    file: Express.Multer.File,
+    createFileAbastecimentoDto: CreateFilesAbastecimentoDto,
+    req: Request): Promise<any> {
+      try {
+        const arquivo = new FilesAbastecimento();
+        arquivo.fileName = file.filename;
+        arquivo.contentLenght = file.size;
+        arquivo.contentType = file.mimetype;
+        arquivo.url = `${req.protocol}://${req.get('host')}/files/abastecimento/${file.filename}`;
+        arquivo.abastecimento = createFileAbastecimentoDto?.abastecimento;
+        await this.repository.save(arquivo);
+        return {success: true};
+      } catch (e) {
+        return {success: false, message: e.message}
+      }
   }
 
-  create(createFilesAbastecimentoDto: CreateFilesAbastecimentoDto) {
-    return 'This action adds a new filesAbastecimento';
+  download(fileName: string): StreamableFile {
+    const file = fs.createReadStream(join(process.cwd(), `./files/abastecimento/${fileName}`));
+    return new StreamableFile(file);
   }
 
-  findAll() {
-    return `This action returns all filesAbastecimento`;
+  findAll(id: string): Promise<FilesAbastecimento[]> {
+   const queryBuilder = this.repository.createQueryBuilder('files_abastecimento');
+   queryBuilder.leftJoinAndSelect('files_abastecimento.abastecimento', 'abastecimento');
+   queryBuilder.where('abastecimento.id = :id', { id: id });
+   return queryBuilder.getMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} filesAbastecimento`;
-  }
-
-  update(id: number, updateFilesAbastecimentoDto: UpdateFilesAbastecimentoDto) {
-    return `This action updates a #${id} filesAbastecimento`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} filesAbastecimento`;
+  async remove(fileName: string) {
+    await fs.unlink(`./files/abastecimento/${fileName}`, (erro) => {
+      if (erro) {
+        console.error(erro);
+        return erro;
+      }
+    });
+    const queryBuilder = this.repository.createQueryBuilder('files_abastecimento')
+    .delete()
+    .from('files_abastecimento')
+    .where('files_abastecimento.file_name = :fileName', {fileName})
+    .execute();
+    return queryBuilder;
   }
 }

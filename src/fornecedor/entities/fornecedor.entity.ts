@@ -25,7 +25,7 @@ export class Fornecedor {
     @Column({ name: 'endereco', type: 'varchar', length: 50 })
     endereco: string;
 
-    @OneToMany(() => Contato, (contatos) => contatos.fornecedor, { eager: true })
+    @OneToMany(() => Contato, (contatos) => contatos.fornecedor, { eager: true, cascade: true })
     contatos: Contato[];//criar entidade cntt - onetomany (apelido tel email)
     
     @OneToMany(() => Entrada, (entradas) => entradas.estoque )

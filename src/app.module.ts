@@ -19,6 +19,10 @@ import { QuilometroModule } from './quilometro/quilometro.module';
 import { CombustivelModule } from './combustivel/combustivel.module';
 import { FilesPecaModule } from './files-peca/files-peca.module';
 import { FilesAbastecimentoModule } from './files-abastecimento/files-abastecimento.module';
+import { FilesFuncionarioModule } from './files-funcionario/files-funcionario.module';
+import { FilesQuilometroModule } from './files-quilometro/files-quilometro.module';
+import { FilesServicoModule } from './files-servico/files-servico.module';
+import { FilesVeiculoModule } from './files-veiculo/files-veiculo.module';
 
 @Module({
   imports: [
@@ -55,6 +59,10 @@ import { FilesAbastecimentoModule } from './files-abastecimento/files-abastecime
     CombustivelModule,
     FilesPecaModule,
     FilesAbastecimentoModule,
+    FilesFuncionarioModule,
+    FilesQuilometroModule,
+    FilesServicoModule,
+    FilesVeiculoModule,
   ],
   controllers: [],
   providers: [],

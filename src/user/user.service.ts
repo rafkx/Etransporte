@@ -4,6 +4,9 @@ import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserWeb } from './entities/userWeb.entity';
+import { PageOptionsDto } from 'src/dtos/page-options.dto';
+import { PageDto } from 'src/DTOs/page.dto';
+import { PageMetaDto } from 'src/DTOs/page-meta.dto';
 
 @Injectable()
 export class UserService {
@@ -14,8 +17,48 @@ export class UserService {
     return await this.repository.save(user);
   }
 
-  async findAll() {
-    return await this.repository.find({ select: ['id', 'name', 'email', 'role'] });
+  async findUsername(text: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<UserWeb>> {
+    const queryBuilder = this.repository.createQueryBuilder('user_web')
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+    queryBuilder.select('user_web.id')
+    .addSelect('user_web.name')
+    .addSelect('user_web.email')
+    .addSelect('user_web.role');
+
+    if (text) {
+      queryBuilder.where('user_web.name LIKE :text', { text: `%${text}%` })
+      .orWhere('user_web.email LIKE :text', { text: `%${text}%` })
+      .orWhere('user_web.role LIKE :text', { text: `%${text}%` })
+    }
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto })
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
+  async paginate(pageOptionsDto: PageOptionsDto): Promise<PageDto<UserWeb>> {
+    const queryBuilder = this.repository.createQueryBuilder('user_web');
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+    queryBuilder.select('user_web.id')
+    .addSelect('user_web.name')
+    .addSelect('user_web.email')
+    .addSelect('user_web.role');
+    
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
+  findAll(): Promise<UserWeb[]> {
+    return this.repository.find();
   }
 
   async findOne(id: string) {

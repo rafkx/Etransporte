@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, UseInterceptors, UploadedFiles, ClassSerializerInterceptor } from '@nestjs/common';
 import { PecasService } from './pecas.service';
 import { CreatePecaDto } from './dto/create-peca.dto';
 import { UpdatePecaDto } from './dto/update-peca.dto';
@@ -6,12 +6,10 @@ import { Response } from 'express';
 import { JwtAuth } from 'src/decorators/jwt.auth.decorator';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
-import { Peca } from './entities/peca.entity';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { PageOptionsDto } from 'src/dtos/page-options.dto';
 
 @Controller('pecas')
+@UseInterceptors(ClassSerializerInterceptor)
 @JwtAuth()
 export class PecasController {
   constructor(private readonly pecasService: PecasService) {}
@@ -26,9 +24,18 @@ export class PecasController {
 
   @Get('filter')
   @Roles(Role.Admin)
-  fiter(@Query('text') text: string) {
-    return this.pecasService.findPecaByName(text)
+  fiter(
+    @Query('text') text: string,
+    @Query() pageOptionsDto: PageOptionsDto,
+    ) {
+    return this.pecasService.findPecaByName(text, pageOptionsDto);
     
+  }
+
+  @Get('paginate')
+  @Roles(Role.Admin)
+  paginate(@Query() pageOptionsDto: PageOptionsDto) {
+    return this.pecasService.paginate(pageOptionsDto);
   }
 
   @Get()

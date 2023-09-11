@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common';
 import { FornecedorService } from './fornecedor.service';
 import { CreateFornecedorDto } from './dto/create-fornecedor.dto';
 import { UpdateFornecedorDto } from './dto/update-fornecedor.dto';
@@ -6,8 +6,13 @@ import { JwtAuth } from 'src/decorators/jwt.auth.decorator';
 import { Response } from 'express';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
+import { Observable } from 'rxjs';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { Fornecedor } from './entities/fornecedor.entity';
+import { PageOptionsDto } from 'src/dtos/page-options.dto';
 
 @Controller('fornecedor')
+@UseInterceptors(ClassSerializerInterceptor)
 @JwtAuth()
 export class FornecedorController {
   constructor(private readonly fornecedorService: FornecedorService) {}
@@ -18,6 +23,21 @@ export class FornecedorController {
     const data = await this.fornecedorService.create(createFornecedorDto);
     res.set('location', '/fornecedor/' + data.id)
     return data;
+  }
+
+  @Get('filter')
+  @Roles(Role.Admin)
+  filter(
+    @Query('text') text: string,
+    @Query() pageOptionsDto: PageOptionsDto,
+    ) {
+      return this.fornecedorService.search(text, pageOptionsDto)
+    }
+
+  @Get('paginate')
+  @Roles(Role.Admin)
+  paginate(@Query() pageOptionsDto: PageOptionsDto) {
+    return this.fornecedorService.paginate(pageOptionsDto);
   }
 
   @Get()

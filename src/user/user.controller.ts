@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, UseGuards, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, UseGuards, Res, Query, ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,8 +6,10 @@ import { Response } from 'express';
 import { JwtAuth } from 'src/decorators/jwt.auth.decorator';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
+import { PageOptionsDto } from 'src/dtos/page-options.dto';
 
 @Controller('user')
+@UseInterceptors(ClassSerializerInterceptor)
 @JwtAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -18,6 +20,22 @@ export class UserController {
     const data = await this.userService.create(createUserDto);
     res.set('location', '/user/' + data.id)
     return data;
+  }
+
+  @Get('filter')
+  @Roles(Role.Admin)
+  filter(
+    @Query('text') text: string,
+    @Query() pageOptionsDto: PageOptionsDto,
+  ) {
+    return this.userService.findUsername(text, pageOptionsDto);
+  }
+
+
+  @Get('paginate')
+  @Roles(Role.Admin)
+  paginate(@Query() pageOptionsDto: PageOptionsDto) {
+    return this.userService.paginate(pageOptionsDto);
   }
 
   @Get()

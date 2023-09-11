@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsDate, IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { Veiculo } from "src/veiculo/entities/veiculo.entity";
 
 
 export class CreateFuncionarioDto {
@@ -105,4 +106,6 @@ export class CreateFuncionarioDto {
     @IsString()
     @IsOptional()
     estadoCarteiraTrab: string;
+
+    veiculos: Veiculo[];
 }
