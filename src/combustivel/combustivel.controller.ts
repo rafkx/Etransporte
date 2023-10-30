@@ -21,7 +21,7 @@ export class CombustivelController {
   }
 
   @Get()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User, Role.Gerente)
   findAll() {
     return this.combustivelService.findAll();
   }

@@ -1,12 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository, Raw } from 'typeorm';
 import { CreateQuilometroDto } from './dto/create-quilometro.dto';
 import { UpdateQuilometroDto } from './dto/update-quilometro.dto';
 import { Quilometro } from './entities/quilometro.entity';
-import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
-import { Veiculo } from 'src/veiculo/entities/veiculo.entity';
-import { Observable, from, map } from 'rxjs';
+import * as moment from 'moment';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
 import { PageDto } from 'src/DTOs/page.dto';
 import { PageMetaDto } from 'src/DTOs/page-meta.dto';
@@ -60,6 +58,22 @@ export class QuilometroService {
     return new PageDto(entities, pageMetaDto);
   }
 
+  async findQuilometroByFuncionario(id: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Quilometro>> {
+    const now = new Date();
+    const queryBuilder = this.repository.createQueryBuilder('quilometro');
+    queryBuilder.leftJoinAndSelect('quilometro.veiculo', 'veiculo');
+    queryBuilder.leftJoinAndSelect('veiculo.funcionarios', 'funcionario');
+    queryBuilder.where('funcionario.id = :id', { id })
+    .andWhere('DATE(quilometro.created_At) = :now', { now });
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto })
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
   findAll(): Promise<Quilometro[]> {
     return this.repository.find();
   }
@@ -79,8 +93,43 @@ export class QuilometroService {
     return this.repository.save(quilometro);
   }
 
+  async updateByUser(id: string, updateQuilometroDto: UpdateQuilometroDto): Promise<Quilometro> {
+    const quilometro = await this.repository.preload({
+      id: id,
+      ...updateQuilometroDto
+    });
+    const now = new Date();
+    let formatedDate = (moment(now).format('YYYY-MM-DD'))
+
+    if (!quilometro) {
+      throw new NotFoundException(`Item ${id} not found`);
+    } else {
+      if (quilometro.createdAt === formatedDate) {
+        return this.repository.save(quilometro);
+      } else {
+        throw new NotAcceptableException();
+      }
+    }
+  }
+
   async remove(id: string) {
     const quilometro = await this.findOne(id)
     return this.repository.remove(quilometro);
+  }
+
+  async removeByFuncionario(id: string) {
+    const quilometro = await this.findOne(id);
+    const now = new Date();
+    let formatedDate = (moment(now).format('YYYY-MM-DD'));
+
+    if (!quilometro) {
+      throw new NotFoundException(`Item ${id} not found`)
+    } else {
+      if (quilometro.createdAt === formatedDate) {
+        return this.repository.remove(quilometro);
+      } else {
+        throw new NotAcceptableException();
+      }
+    }
   }
 }

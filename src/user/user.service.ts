@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { hashSync, compare } from 'bcrypt';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,6 +8,7 @@ import { UserWeb } from './entities/userWeb.entity';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
 import { PageDto } from 'src/DTOs/page.dto';
 import { PageMetaDto } from 'src/DTOs/page-meta.dto';
+import { Hash } from 'crypto';
 
 @Injectable()
 export class UserService {
@@ -73,15 +75,21 @@ export class UserService {
     }
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    const user = await this.repository.preload({
-      id: id,
-      ...updateUserDto,
-    });
-    if (!user){
-      throw new NotFoundException(`Item ${id} not found`);
+  async update(email: string, updateUserDto: UpdateUserDto): Promise<UserWeb> {
+    const user = await this.findOneOrFail({ where: { email: email }});
+
+    const passwordHashed = await hashSync(updateUserDto.newPassword, 10);
+
+    const isMatch = await compare(updateUserDto.lastPassword, user.password);
+
+    if (!isMatch) {
+      throw new BadRequestException('Senha antiga inválida!');
     }
-    return this.repository.save(user);
+
+    return this.repository.save({
+      ...user,
+      password: passwordHashed,
+    });
   }
 
   async remove(id: string) {

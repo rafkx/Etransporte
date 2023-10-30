@@ -16,9 +16,9 @@ export class CreateEntradaDto {
     @IsNotEmpty()
     data: Date;
 
-    @IsObject()
+    @IsNotEmpty()
     estoque: Estoque;
     
-    @IsObject()
+    @IsNotEmpty()
     fornecedor: Fornecedor;
 }

@@ -35,7 +35,7 @@ export class UserWeb {
         cascade: true, 
         onDelete: "CASCADE"
     })
-    @JoinColumn()
+    @JoinColumn({ name: 'funcionario_id'})
     funcionario: Funcionario;
     
     static role: any;

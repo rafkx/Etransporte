@@ -106,6 +106,4 @@ export class CreateFuncionarioDto {
     @IsString()
     @IsOptional()
     estadoCarteiraTrab: string;
-
-    veiculos: Veiculo[];
 }

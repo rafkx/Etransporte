@@ -17,7 +17,7 @@ export class FilesQuilometroController {
   constructor(private readonly filesQuilometroService: FilesQuilometroService) {}
 
   @Post()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User, Role.Gerente)
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: './files/quilometro',
@@ -38,19 +38,19 @@ export class FilesQuilometroController {
   }
 
   @Get('download/:fileName')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User, Role.Gerente)
   download(@Param('fileName') fileName: string): StreamableFile {
     return this.filesQuilometroService.download(fileName);
   }
 
   @Get(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User, Role.Gerente)
   findOne(@Param('id') id: string) {
     return this.filesQuilometroService.findAll(id);
   }
 
   @Delete(':fileName')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User, Role.Gerente)
   remove(@Param('fileName') fileName: string) {
     return this.filesQuilometroService.remove(fileName);
   }

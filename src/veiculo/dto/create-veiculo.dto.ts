@@ -1,4 +1,5 @@
 import { IsBoolean, IsDate, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
+import { Combustivel } from "src/combustivel/entities/combustivel.entity";
 import { Funcionario } from "src/funcionario/entities/funcionario.entity";
 
 export class CreateVeiculoDto {
@@ -32,9 +33,8 @@ export class CreateVeiculoDto {
     @IsNotEmpty()
     marca: string;
 
-    @IsString()
     @IsNotEmpty()
-    combustivel: string;
+    combustivel: Combustivel;
 
     @IsInt()
     @IsNotEmpty()
@@ -64,7 +64,6 @@ export class CreateVeiculoDto {
     @IsOptional()
     bloqueador: boolean;
 
-    //@IsDate()
     @IsNotEmpty()
     dataAquisicao: Date;
 
@@ -98,6 +97,4 @@ export class CreateVeiculoDto {
     @IsString()
     @IsNotEmpty()
     descricao: string;
-
-    funcionario?: Funcionario;
 }

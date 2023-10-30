@@ -56,6 +56,24 @@ export class ServicoService {
     return new PageDto(entities, pageMetaDto);
   }
 
+  async findServicoByFuncionario(id: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Servico>> {
+    const queryBuilder = this.repository.createQueryBuilder('servico');
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+    queryBuilder.leftJoinAndSelect('servico.fornecedor', 'fornecedor');
+    queryBuilder.leftJoinAndSelect('servico.veiculo', 'veiculo');
+    queryBuilder.leftJoinAndSelect('veiculo.funcionarios', 'funcionario')
+    
+    queryBuilder.where('funcionario.id = :id', { id });
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
   findAll(): Promise<Servico[]> {
     return this.repository.find();
   }

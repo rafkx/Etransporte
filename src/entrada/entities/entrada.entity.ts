@@ -16,7 +16,7 @@ export class Entrada {
     @Column({ name: 'valor_aquisicao', type: 'int'})
     valorAquisicao: number;
 
-    @Column({ name: 'data', type: 'timestamptz'})
+    @Column({ name: 'data', type: 'date'})
     data: Date;
     
     @ManyToOne(() => Estoque, (estoque) => estoque.entradas, { eager: true })//manytoone

@@ -29,7 +29,9 @@ export class CreatePecaDto {
     @IsOptional()
     pequenaPeca?: Peca[];
     
+    @IsNotEmpty()
     fornecedorP: Fornecedor;
     
+    @IsNotEmpty()
     veiculo: Veiculo[];
 }

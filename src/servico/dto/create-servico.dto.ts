@@ -12,7 +12,9 @@ export class CreateServicoDto {
     @IsNotEmpty()
     cod: string;
     
+    @IsNotEmpty()
     fornecedor: Fornecedor;
 
+    @IsNotEmpty()
     veiculo: Veiculo[];
 }

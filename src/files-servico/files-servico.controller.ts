@@ -17,9 +17,9 @@ export class FilesServicoController {
   constructor(private readonly filesServicoService: FilesServicoService) {}
 
   @Post()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   @UseInterceptors(FileFieldsInterceptor([
-    { name: 'file', maxCount: 2 }
+    { name: 'file', maxCount: 5 }
   ], {
     storage: diskStorage({
       destination: './files/servico',
@@ -40,19 +40,19 @@ export class FilesServicoController {
   }
 
   @Get('download/:fileName')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   download(@Param('fileName') fileName: string): StreamableFile {
     return this.filesServicoService.download(fileName);
   }
 
   @Get(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   findAll(@Param('id') id: string) {
     return this.filesServicoService.findAll(id);
   }
 
   @Delete(':fileName')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   remove(@Param('fileName') fileName: string) {
     return this.filesServicoService.remove(fileName);
   }

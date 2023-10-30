@@ -7,6 +7,8 @@ import { JwtAuth } from 'src/decorators/jwt.auth.decorator';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
+import { AuthUser } from 'src/auth/decorator/request.user.decorator';
+import { Payload } from 'src/DTOs/payload.dto';
 
 @Controller('pecas')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -15,7 +17,7 @@ export class PecasController {
   constructor(private readonly pecasService: PecasService) {}
 
   @Post()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   async create(@Body() createPecaDto: CreatePecaDto, @Res({ passthrough: true }) res: Response) {
     const data = await this.pecasService.create(createPecaDto);
     res.set('location', '/pecas/' + data.id);
@@ -23,7 +25,7 @@ export class PecasController {
   }
 
   @Get('filter')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   fiter(
     @Query('text') text: string,
     @Query() pageOptionsDto: PageOptionsDto,
@@ -33,31 +35,38 @@ export class PecasController {
   }
 
   @Get('paginate')
-  @Roles(Role.Admin)
-  paginate(@Query() pageOptionsDto: PageOptionsDto) {
-    return this.pecasService.paginate(pageOptionsDto);
+  @Roles(Role.Admin, Role.User, Role.Gerente)
+  paginate(
+    @Query() pageOptionsDto: PageOptionsDto,
+    @AuthUser() user: Payload  
+  ) {
+    if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
+      return this.pecasService.paginate(pageOptionsDto);
+    } else {
+      return this.pecasService.findPecaByFuncionario(user.funcionario, pageOptionsDto);
+    }
   }
 
   @Get()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   findAll() {
     return this.pecasService.findAll();
   }
 
   @Get(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   findOne(@Param('id') id: string) {
     return this.pecasService.findOne(id);
   }
 
   @Patch(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   update(@Param('id') id: string, @Body() updatePecaDto: UpdatePecaDto) {
     return this.pecasService.update(id, updatePecaDto);
   }
 
   @Delete(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   remove(@Param('id') id: string) {
     return this.pecasService.remove(id);
   }

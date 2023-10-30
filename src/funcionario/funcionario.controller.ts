@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { Funcionario } from './entities/funcionario.entity';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
+import { AssociateFuncionarioVeiculoDto } from './dto/associate-funcionario-veiculo.dto';
 
 @Controller('funcionario')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -56,6 +57,12 @@ export class FuncionarioController {
   @Roles(Role.Admin)
   update(@Param('id') id: string, @Body() updateFuncionarioDto: UpdateFuncionarioDto) {
     return this.funcionarioService.update(id, updateFuncionarioDto);
+  }
+
+  @Patch('association/:id')
+  @Roles(Role.Admin, Role.Gerente)
+  associate(@Param('id') id: string, @Body() associateFuncionarioVeiculo: AssociateFuncionarioVeiculoDto) {
+    return this.funcionarioService.associate(id, associateFuncionarioVeiculo);
   }
 
   @Delete(':id')

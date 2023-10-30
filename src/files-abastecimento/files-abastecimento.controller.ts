@@ -17,7 +17,7 @@ export class FilesAbastecimentoController {
   constructor(private readonly filesAbastecimentoService: FilesAbastecimentoService) {}
 
   @Post()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User, Role.Gerente)
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: './files/abastecimento',
@@ -37,19 +37,19 @@ export class FilesAbastecimentoController {
   }
 
   @Get('download/:fileName')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User, Role.Gerente)
   download(@Param('fileName') fileName: string): StreamableFile {
     return this.filesAbastecimentoService.download(fileName);
   }
 
   @Get(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User, Role.Gerente)
   findAll(@Param('id') id: string) {
     return this.filesAbastecimentoService.findAll(id);
   }
 
   @Delete(':fileName')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User, Role.Gerente)
   remove(@Param('fileName') fileName: string) {
     return this.filesAbastecimentoService.remove(fileName);
   }

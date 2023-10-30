@@ -18,8 +18,18 @@ export class Servico {
     @ManyToOne(() => Fornecedor, (fornecedor) => fornecedor.servicos, { eager: true })
     fornecedor: Fornecedor;
 
-    @ManyToMany(() => Veiculo, { eager: true })
-    @JoinTable()
+    @ManyToMany(() => Veiculo, veiculos => veiculos.servicos)
+    @JoinTable({
+        name: 'servico_veiculo',
+        joinColumn: {
+            name: 'servico_id',
+            referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+            name: 'veiculo_id',
+            referencedColumnName: 'id',
+        },
+    })
     veiculo: Veiculo[];
 
     @OneToMany(() => FilesServico, (files) => files.servico)

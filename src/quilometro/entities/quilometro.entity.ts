@@ -2,7 +2,7 @@ import { type } from "os";
 import { Abastecimento } from "src/abastecimento/entities/abastecimento.entity";
 import { FilesQuilometro } from "src/files-quilometro/entities/files-quilometro.entity";
 import { Veiculo } from "src/veiculo/entities/veiculo.entity";
-import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Quilometro {
@@ -12,6 +12,9 @@ export class Quilometro {
 
     @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
     updatedAt: Date;
+
+    @CreateDateColumn({ name: 'created_At', type: 'date' })
+    createdAt: string;
 
     @Column({ name: 'quantidade_quilometro', type: 'int' })
     quantKm: number;

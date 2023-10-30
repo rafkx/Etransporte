@@ -5,6 +5,7 @@ import { Veiculo } from "src/veiculo/entities/veiculo.entity";
 
 export class CreateAbastecimentoDto {
     
+    @IsNotEmpty()
     combustivel: Combustivel;
     
     @IsNumber()
@@ -25,7 +26,9 @@ export class CreateAbastecimentoDto {
     @IsNotEmpty()
     data: Date;
 
+    @IsNotEmpty()
     veiculo: Veiculo;
     
+    @IsNotEmpty()
     km: Quilometro;
 }

@@ -1,8 +1,11 @@
 import { Abastecimento } from "src/abastecimento/entities/abastecimento.entity";
+import { Combustivel } from "src/combustivel/entities/combustivel.entity";
 import { FilesVeiculo } from "src/files-veiculo/entities/files-veiculo.entity";
 import { Funcionario } from "src/funcionario/entities/funcionario.entity";
+import { Peca } from "src/pecas/entities/peca.entity";
 import { Quilometro } from "src/quilometro/entities/quilometro.entity";
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Servico } from "src/servico/entities/servico.entity";
+import { Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Veiculo {
@@ -33,9 +36,6 @@ export class Veiculo {
     @Column({ name: 'marca', type: 'varchar', length: 50 })
     marca: string;
 
-    @Column({ name: 'combustivel', type: 'varchar', length: 50 })
-    combustivel: string;
-
     @Column({ name: 'ultima_km', type: 'int' })
     ultimaKm: number;
 
@@ -57,7 +57,7 @@ export class Veiculo {
     @Column({ name: 'bloqueador', type: 'boolean', nullable: true })
     bloqueador?: boolean;
 
-    @Column({ name: 'data_aquisicao', type: 'timestamptz' })
+    @Column({ name: 'data_aquisicao', type: 'date' })
     dataAquisicao: Date;
 
     @Column({ name: 'condicao', type: 'varchar', length: 50 })
@@ -81,6 +81,9 @@ export class Veiculo {
     @Column({ name: 'descricao', type: 'varchar', length: 500 })
     descricao: string;
 
+    @ManyToOne(() => Combustivel, (combustivel) => combustivel.veiculo)
+    combustivel: Combustivel;
+
     @OneToMany(() => Abastecimento, (abastecimento) => abastecimento.veiculo)
     abastecimento: Abastecimento[];
 
@@ -90,7 +93,13 @@ export class Veiculo {
     @OneToMany(() => FilesVeiculo, (files) => files.veiculo)
     files: FilesVeiculo[];
 
-    @ManyToOne(() => Funcionario, (funcionario) => funcionario.veiculos)
-    funcionario: Funcionario;
+    @ManyToMany(() => Funcionario, funcionario => funcionario.veiculos)
+    funcionarios: Funcionario[];
+
+    @ManyToMany(() => Servico, servicos => servicos.veiculo)
+    servicos: Servico[];
+
+    @ManyToMany(() => Peca, pecas => pecas.veiculo)
+    pecas: Peca[];
 }
 

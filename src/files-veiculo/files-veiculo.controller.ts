@@ -21,7 +21,7 @@ export class FilesVeiculoController {
   @Post()
   @Roles(Role.Admin)
   @UseInterceptors(FileFieldsInterceptor([
-    { name: 'file', maxCount: 2 },
+    { name: 'file', maxCount: 5 },
   ], {
     storage: diskStorage({
       destination: './files/veiculo',
@@ -42,13 +42,13 @@ export class FilesVeiculoController {
   }
 
   @Get('download/:fileName')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   download(@Param('fileName') fileName: string): StreamableFile {
     return this.filesVeiculoService.download(fileName);
   }
 
   @Get(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   findOne(@Param('id') id: string) {
     return this.filesVeiculoService.findAll(id);
   }

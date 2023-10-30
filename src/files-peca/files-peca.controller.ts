@@ -17,9 +17,9 @@ export class FilesPecaController {
   constructor(private readonly filesPecaService: FilesPecaService) {}
 
   @Post()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   @UseInterceptors(FileFieldsInterceptor([
-    { name: 'file', maxCount: 2 },
+    { name: 'file', maxCount: 5 },
   ], {
     storage: diskStorage({
       destination: './files/peca', 
@@ -40,19 +40,19 @@ export class FilesPecaController {
   }
 
   @Get('download/:fileName')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   download(@Param('fileName') fileName: string): StreamableFile {
     return this.filesPecaService.download(fileName);
   }
 
   @Get(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   findAll(@Param('id') id: string) {
     return this.filesPecaService.findAll(id);
   }
 
   @Delete(':fileName')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   remove(@Param('fileName') fileName: string) {
     return this.filesPecaService.remove(fileName);
   }

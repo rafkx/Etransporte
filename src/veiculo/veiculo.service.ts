@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Like, Not, Repository } from 'typeorm';
 import { CreateVeiculoDto } from './dto/create-veiculo.dto';
 import { UpdateVeiculoDto } from './dto/update-veiculo.dto';
 import { Veiculo } from './entities/veiculo.entity';
@@ -49,12 +49,19 @@ export class VeiculoService {
     return new PageDto(entities, pageMetaDto);
   }
 
-  findVeiculoByFuncionario(id: string): Promise<Veiculo[]> {
+  async findVeiculoByFuncionario(id: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Veiculo>> {
     const queryBuilder = this.repository.createQueryBuilder('veiculo');
-    queryBuilder.leftJoinAndSelect('veiculo.funcionario', 'funcionario');
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+    queryBuilder.leftJoinAndSelect('veiculo.funcionarios', 'funcionario');
     queryBuilder.where('funcionario.id = :id', { id });
 
-    return queryBuilder.getMany();
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto })
+
+    return new PageDto(entities, pageMetaDto);
   }
 
   async paginate(pageOptionsDto: PageOptionsDto): Promise<PageDto<Veiculo>> {
@@ -70,11 +77,29 @@ export class VeiculoService {
     return new PageDto(entities, pageMetaDto);
   }
 
+  findAvailableVeiculos(id: string): Promise<Veiculo[]> {
+    return this.repository.find({
+      where: {
+        funcionarios: {
+          id: Not(id)
+        }
+      }
+    });
+  }
+
+  findAllByFuncionario(id: string): Promise<Veiculo[]> {
+    const queryBuilder = this.repository.createQueryBuilder('veiculo');
+    queryBuilder.leftJoinAndSelect('veiculo.funcionarios', 'funcionario');
+    queryBuilder.where('funcionario.id = :id', { id });
+
+    return queryBuilder.getMany();
+  }
+
   findAll(): Promise<Veiculo[]> {
     return this.repository.find();
   }
 
-  findOne(id: string): Promise<Veiculo> {
+  findOne(id: string) {
     return this.repository.findOneBy({id});
   }
 

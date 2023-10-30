@@ -7,6 +7,9 @@ import { JwtAuth } from 'src/decorators/jwt.auth.decorator';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
+import { AuthUser } from 'src/auth/decorator/request.user.decorator';
+import { AuthService } from 'src/auth/auth.service';
+import { Payload } from 'src/DTOs/payload.dto';
 
 @Controller('veiculo')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -23,7 +26,7 @@ export class VeiculoController {
   }
 
   @Get('filter')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   filter(
     @Query('ano') ano: number, 
     @Query('text') text: string,
@@ -33,27 +36,37 @@ export class VeiculoController {
   }
 
   @Get('paginate')
-  @Roles(Role.Admin)
-  paginate(@Query() pageOptionsDto: PageOptionsDto) {
-    return this.veiculoService.paginate(pageOptionsDto);
-  }
-
-  @Get()
-  @Roles(Role.Admin)
-  findAll() {
-    return this.veiculoService.findAll();
-  }
-
-  @Get('search/:id')
-  @Roles(Role.User, Role.Admin)
-  searchFuncionario(
-    @Param('id') id: string
+  @Roles(Role.Admin, Role.User, Role.Gerente)
+  paginate(
+    @Query() pageOptionsDto: PageOptionsDto, 
+    @AuthUser() user: Payload  
   ) {
-    return this.veiculoService.findVeiculoByFuncionario(id);
+    console.log(user);
+    if(user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
+      return this.veiculoService.paginate(pageOptionsDto);
+    } else {
+      return this.veiculoService.findVeiculoByFuncionario(user.funcionario, pageOptionsDto);
+    }
+  }
+
+  @Get('available/:id')
+  @Roles(Role.Admin)
+  findAllVeiculos(@Param('id') id: string) {
+    return this.veiculoService.findAvailableVeiculos(id);
   }
 
   @Get()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User, Role.Gerente)
+  findAll(@AuthUser() user: Payload) {
+    if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
+      return this.veiculoService.findAll();
+    } else {
+      return this.veiculoService.findAllByFuncionario(user.funcionario);
+    }
+  }
+
+  @Get(':id')
+  @Roles(Role.Admin, Role.Gerente)
   findOne(@Param('id') id: string) {
     return this.veiculoService.findOne(id);
   }

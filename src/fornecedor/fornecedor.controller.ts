@@ -18,7 +18,7 @@ export class FornecedorController {
   constructor(private readonly fornecedorService: FornecedorService) {}
 
   @Post()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   async create(@Body() createFornecedorDto: CreateFornecedorDto, @Res({ passthrough: true }) res: Response) {
     const data = await this.fornecedorService.create(createFornecedorDto);
     res.set('location', '/fornecedor/' + data.id)
@@ -26,7 +26,7 @@ export class FornecedorController {
   }
 
   @Get('filter')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   filter(
     @Query('text') text: string,
     @Query() pageOptionsDto: PageOptionsDto,
@@ -35,31 +35,31 @@ export class FornecedorController {
     }
 
   @Get('paginate')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User, Role.Gerente)
   paginate(@Query() pageOptionsDto: PageOptionsDto) {
     return this.fornecedorService.paginate(pageOptionsDto);
   }
 
   @Get()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   findAll() {
     return this.fornecedorService.findAll();
   }
 
   @Get(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   findOne(@Param('id') id: string) {
     return this.fornecedorService.findOne(id);
   }
 
   @Patch(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   update(@Param('id') id: string, @Body() updateFornecedorDto: UpdateFornecedorDto) {
     return this.fornecedorService.update(id, updateFornecedorDto);
   }
 
   @Delete(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   remove(@Param('id') id: string) {
     return this.fornecedorService.remove(id);
   }

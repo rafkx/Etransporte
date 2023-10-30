@@ -19,5 +19,6 @@ export class CreateFornecedorDto {
     @IsNotEmpty()
     endereco: string;
 
+    @IsNotEmpty()
     contatos: Contato[];
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateFuncionarioDto } from './dto/create-funcionario.dto';
@@ -10,6 +10,7 @@ import { Veiculo } from 'src/veiculo/entities/veiculo.entity';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
 import { PageDto } from 'src/DTOs/page.dto';
 import { PageMetaDto } from 'src/DTOs/page-meta.dto';
+import { AssociateFuncionarioVeiculoDto } from './dto/associate-funcionario-veiculo.dto';
 
 @Injectable()
 export class FuncionarioService {
@@ -69,6 +70,21 @@ export class FuncionarioService {
       throw new NotFoundException(`Item ${id} not found`);
     }
     return this.repository.save(funcionario);
+  }
+
+  async associate(id: string, associateFuncionarioVeiculo: AssociateFuncionarioVeiculoDto): Promise<Funcionario> {
+    const funcionario = await this.findOne(id);
+    
+    if (!funcionario) {
+      throw new NotFoundException(`Item ${id} not found`)
+    }
+
+    await this.repository.createQueryBuilder()
+    .relation(Funcionario, 'veiculos')
+    .of(funcionario)
+    .add(associateFuncionarioVeiculo.veiculos);
+    
+    return funcionario;
   }
 
   async remove(id: string) {

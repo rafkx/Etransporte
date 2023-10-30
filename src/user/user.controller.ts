@@ -7,6 +7,8 @@ import { JwtAuth } from 'src/decorators/jwt.auth.decorator';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
+import { AuthUser } from 'src/auth/decorator/request.user.decorator';
+import { Payload } from 'src/DTOs/payload.dto';
 
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -45,15 +47,18 @@ export class UserController {
   }
 
   @Get(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User)
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.userService.findOne(id);
   }
 
-  @Patch(':id')
-  @Roles(Role.Admin)
-  update(@Param('id', new ParseUUIDPipe()) id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  @Patch()
+  @Roles(Role.Admin, Role.User, Role.Gerente)
+  update(
+    @Body() updateUserDto: UpdateUserDto,
+    @AuthUser() user: Payload
+  ) {
+    return this.userService.update(user.email, updateUserDto);
   }
 
   @Delete(':id')

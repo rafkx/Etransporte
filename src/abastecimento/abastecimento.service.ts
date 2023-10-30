@@ -1,12 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Like, Raw, Repository } from 'typeorm';
 import { CreateAbastecimentoDto } from './dto/create-abastecimento.dto';
 import { UpdateAbastecimentoDto } from './dto/update-abastecimento.dto';
 import { Abastecimento } from './entities/abastecimento.entity';
-import { IPaginationMeta, IPaginationOptions, Pagination, paginate, paginateRawAndEntities } from 'nestjs-typeorm-paginate';
-import { Observable, from, map } from 'rxjs';
-import { query } from 'express';
+import * as moment from 'moment';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
 import { PageDto } from 'src/DTOs/page.dto';
 import { PageMetaDto } from 'src/DTOs/page-meta.dto';
@@ -63,6 +61,25 @@ export class AbastecimentoService {
     return new PageDto(entities, pageMetaDto);
   }
 
+  async findAbastecimentoByFuncionario(id: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Abastecimento>> {
+    const now = new Date();
+    const queryBuilder = this.repository.createQueryBuilder('abastecimento');
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+    queryBuilder.leftJoinAndSelect('abastecimento.combustivel', 'combustivel');
+    queryBuilder.leftJoinAndSelect('abastecimento.veiculo', 'veiculo');
+    queryBuilder.leftJoinAndSelect('veiculo.funcionarios', 'funcionario');
+    queryBuilder.where('funcionario.id = :id', { id })
+    .andWhere('DATE(abastecimento.created_At) = :now', { now });
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
   findAll(): Promise<Abastecimento[]> {
     return this.repository.find();
   }
@@ -82,8 +99,43 @@ export class AbastecimentoService {
     return this.repository.save(abastecimento);
   }
 
+  async updateByUser(id: string, updateAbastecimentoDto: UpdateAbastecimentoDto): Promise<Abastecimento> {
+    const abastecimento = await this.repository.preload({
+      id: id, 
+      ...updateAbastecimentoDto,
+    });
+    const now = new Date();
+    let formatedDate = (moment(now).format('YYYY-MM-DD'));
+
+    if(!abastecimento) {
+      throw new NotFoundException(`Item ${id} not found`);
+    } else {
+      if (abastecimento.createdAt === formatedDate) {
+        return this.repository.save(abastecimento);
+      } else {
+        throw new NotAcceptableException();
+      }
+    }
+  }
+
   async remove(id: string) {
     const abastecimento = await this.findOne(id);
     return this.repository.remove(abastecimento);
+  }
+
+  async removeByFuncionario(id: string) {
+    const abastecimento = await this.findOne(id);
+    const now = new Date();
+    let formatedDate = (moment(now).format('YYYY-MM-DD'));
+
+    if (!abastecimento) {
+      throw new NotFoundException(`Item ${id} not found`);
+    } else {
+      if (abastecimento.createdAt === formatedDate) {
+        return this.repository.remove(abastecimento);
+      } else {
+        throw new NotAcceptableException();
+      }
+    }
   }
 }

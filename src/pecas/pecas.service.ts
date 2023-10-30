@@ -54,6 +54,23 @@ export class PecasService {
     return new PageDto(entities, pageMetaDto);
   }
 
+  async findPecaByFuncionario(id: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Peca>> {
+    const queryBuilder = this.repository.createQueryBuilder('peca');
+    queryBuilder.skip(pageOptionsDto.skip);
+    queryBuilder.take(pageOptionsDto.take);
+    queryBuilder.leftJoinAndSelect('peca.fornecedorP', 'forncedorP');
+    queryBuilder.leftJoinAndSelect('peca.veiculo', 'veiculo');
+    queryBuilder.leftJoinAndSelect('veiculo.funcionarios', 'funcionario');
+    queryBuilder.where('funcionario.id = :id', { id });
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
+  }
+
   findAll(): Promise<Peca[]> {
     return this.repository.find();
   }

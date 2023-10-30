@@ -2,7 +2,7 @@ import { Combustivel } from "src/combustivel/entities/combustivel.entity";
 import { FilesAbastecimento } from "src/files-abastecimento/entities/files-abastecimento.entity";
 import { Quilometro } from "src/quilometro/entities/quilometro.entity";
 import { Veiculo } from "src/veiculo/entities/veiculo.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Abastecimento {
@@ -12,6 +12,9 @@ export class Abastecimento {
 
     @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
     updatedAt: Date;
+
+    @CreateDateColumn({ name: 'created_At', type: 'date' })
+    createdAt: string;
 
     @Column({ name: 'quantidade_litros', type: 'float' })
     quantLitros: number;

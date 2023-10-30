@@ -1,6 +1,6 @@
 import { FilesFuncionario } from "src/files-funcionario/entities/files-funcionario.entity";
 import { Veiculo } from "src/veiculo/entities/veiculo.entity";
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Funcionario extends BaseEntity {
@@ -25,7 +25,7 @@ export class Funcionario extends BaseEntity {
     @Column({ name: 'sexoFun', type: 'varchar', nullable: true, length: 50 })
     sexoFun?: string;
 
-    @Column({ name: 'dataNasciFun', type: 'timestamptz' })
+    @Column({ name: 'dataNasciFun', type: 'date' })
     dataNasciFun: Date;
 
     @Column({ name: 'tituloEleitor', type: 'varchar', nullable: true, length: 50 })
@@ -58,7 +58,7 @@ export class Funcionario extends BaseEntity {
     @Column({ name: 'salario', type: 'int'})
     salario: number;
 
-    @Column({ name: 'dataAdmissao', type: 'timestamptz' })
+    @Column({ name: 'dataAdmissao', type: 'date' })
     dataAdmissao: Date;
 
     @Column({ name: 'horarioTrabalho', type: 'varchar', nullable: true, length: 50 })
@@ -88,6 +88,17 @@ export class Funcionario extends BaseEntity {
     @OneToMany(() => FilesFuncionario, (files) => files.funcionario)
     files: FilesFuncionario[];
 
-    @OneToMany(() => Veiculo, (veiculo) => veiculo.funcionario)
+    @ManyToMany(() => Veiculo, veiculos => veiculos.funcionarios)
+    @JoinTable({
+        name: 'funcionario_veiculo',
+        joinColumn: {
+            name: 'funcionario_id',
+            referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+            name: 'veiculo_id',
+            referencedColumnName: 'id',
+        },
+    })
     veiculos: Veiculo[];
 }

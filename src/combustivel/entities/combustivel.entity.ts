@@ -1,5 +1,6 @@
 import { Abastecimento } from "src/abastecimento/entities/abastecimento.entity";
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Veiculo } from "src/veiculo/entities/veiculo.entity";
+import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Combustivel extends BaseEntity {
@@ -14,4 +15,7 @@ export class Combustivel extends BaseEntity {
 
     @OneToMany(() => Abastecimento, (abastecimentos) => abastecimentos.combustivel)
     abastecimento: Abastecimento[]; 
+
+    @OneToMany(() => Veiculo, (veiculo) => veiculo.combustivel)
+    veiculo: Veiculo[];
 }

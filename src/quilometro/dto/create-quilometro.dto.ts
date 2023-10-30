@@ -11,5 +11,6 @@ export class CreateQuilometroDto {
     @IsNotEmpty()
     data: Date;
 
+    @IsNotEmpty()
     veiculo: Veiculo;
 }

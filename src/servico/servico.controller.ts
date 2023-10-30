@@ -6,13 +6,9 @@ import { Response } from 'express';
 import { JwtAuth } from 'src/decorators/jwt.auth.decorator';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { Observable } from 'rxjs';
-import { Pagination } from 'nestjs-typeorm-paginate';
-import { Servico } from './entities/servico.entity';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
+import { AuthUser } from 'src/auth/decorator/request.user.decorator';
+import { Payload } from 'src/DTOs/payload.dto';
 
 @Controller('servico')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -21,7 +17,7 @@ export class ServicoController {
   constructor(private readonly servicoService: ServicoService) {}
 
   @Post()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   async create(@Body() createServicoDto: CreateServicoDto, @Res({ passthrough: true }) res: Response ) {
     const data = await this.servicoService.create(createServicoDto);
     res.set('location', '/servico/' + data.id);
@@ -29,7 +25,7 @@ export class ServicoController {
   }
 
   @Get('filter')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   filter(
     @Query('text') text: string,
     @Query() pageOptionsDto: PageOptionsDto
@@ -38,31 +34,38 @@ export class ServicoController {
   }
 
   @Get('paginate')
-  @Roles(Role.Admin)
-  paginate(@Query() pageOptionsDto: PageOptionsDto) {
-    return this.servicoService.paginate(pageOptionsDto);
+  @Roles(Role.Admin, Role.User, Role.Gerente)
+  paginate(
+    @Query() pageOptionsDto: PageOptionsDto,
+    @AuthUser() user: Payload,
+  ) {
+    if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
+      return this.servicoService.paginate(pageOptionsDto);
+    } else {
+      return this.servicoService.findServicoByFuncionario(user.funcionario, pageOptionsDto);
+    }
   }
 
   @Get()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   findAll() {
     return this.servicoService.findAll();
   }
 
   @Get(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   findOne(@Param('id') id: string) {
     return this.servicoService.findOne(id);
   }
 
   @Patch(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   update(@Param('id') id: string, @Body() updateServicoDto: UpdateServicoDto) {
     return this.servicoService.update(id, updateServicoDto);
   }
 
   @Delete(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   remove(@Param('id') id: string) {
     return this.servicoService.remove(id);
   }
