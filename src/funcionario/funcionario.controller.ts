@@ -6,11 +6,7 @@ import { Roles } from '../decorators/role.decorator';
 import { Role } from '../enums/role.enum';
 import { JwtAuth } from '../decorators/jwt.auth.decorator';
 import { Response } from 'express';
-import { Observable } from 'rxjs';
-import { Pagination } from 'nestjs-typeorm-paginate';
-import { Funcionario } from './entities/funcionario.entity';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
-import { AssociateFuncionarioVeiculoDto } from './dto/associate-funcionario-veiculo.dto';
 
 @Controller('funcionario')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -27,7 +23,7 @@ export class FuncionarioController {
   }
 
   @Get('filter')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   filter(
     @Query('text') text: string,
     @Query() pageOptionsDto: PageOptionsDto
@@ -36,19 +32,19 @@ export class FuncionarioController {
   }
 
   @Get('paginate')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   paginate(@Query() pageOptionsDto: PageOptionsDto) {
     return this.funcionarioService.paginate(pageOptionsDto);
   }
 
   @Get()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   findAll() {
     return this.funcionarioService.findAll();
   }
 
   @Get(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Gerente)
   findOne(@Param('id') id: string) {
     return this.funcionarioService.findOne(id);
   }
@@ -57,12 +53,6 @@ export class FuncionarioController {
   @Roles(Role.Admin)
   update(@Param('id') id: string, @Body() updateFuncionarioDto: UpdateFuncionarioDto) {
     return this.funcionarioService.update(id, updateFuncionarioDto);
-  }
-
-  @Patch('association/:id')
-  @Roles(Role.Admin, Role.Gerente)
-  associate(@Param('id') id: string, @Body() associateFuncionarioVeiculo: AssociateFuncionarioVeiculoDto) {
-    return this.funcionarioService.associate(id, associateFuncionarioVeiculo);
   }
 
   @Delete(':id')

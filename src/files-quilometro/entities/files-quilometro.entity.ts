@@ -19,6 +19,6 @@ export class FilesQuilometro {
     @Column({ name: 'url', type: 'varchar', nullable: false })
     url: string;
 
-    @ManyToOne(() => Quilometro, (quilometro) => quilometro.files)
+    @ManyToOne(() => Quilometro, (quilometro) => quilometro.files, { onDelete: "CASCADE"})
     quilometro: Quilometro;
 }

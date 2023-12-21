@@ -30,7 +30,7 @@ export class AbastecimentoController {
   @Get('filter')
   @Roles(Role.Admin, Role.Gerente)
   filter(
-    @Query('data') data: Date, 
+    @Query('data') data: any, 
     @Query('text') text: string,
     @Query() pageOptionsDto: PageOptionsDto,
     ) {

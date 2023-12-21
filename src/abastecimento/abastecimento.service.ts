@@ -68,8 +68,8 @@ export class AbastecimentoService {
     queryBuilder.take(pageOptionsDto.take);
     queryBuilder.leftJoinAndSelect('abastecimento.combustivel', 'combustivel');
     queryBuilder.leftJoinAndSelect('abastecimento.veiculo', 'veiculo');
-    queryBuilder.leftJoinAndSelect('veiculo.funcionarios', 'funcionario');
-    queryBuilder.where('funcionario.id = :id', { id })
+    queryBuilder.leftJoinAndSelect('veiculo.autorizacao', 'autorizacao');
+    queryBuilder.where('autorizacao.funcionario.id = :id', { id })
     .andWhere('DATE(abastecimento.created_At) = :now', { now });
 
     const itemCount = await queryBuilder.getCount();
@@ -85,7 +85,14 @@ export class AbastecimentoService {
   }
 
   findOne(id: string): Promise<Abastecimento> {
-    return this.repository.findOneBy({id});
+    return this.repository.findOne({
+      relations: {
+        combustivel: true
+      },
+      where: {
+        id: id
+      }
+    });
   }
 
   async update(id: string, updateAbastecimentoDto: UpdateAbastecimentoDto): Promise<Abastecimento> {
@@ -113,7 +120,7 @@ export class AbastecimentoService {
       if (abastecimento.createdAt === formatedDate) {
         return this.repository.save(abastecimento);
       } else {
-        throw new NotAcceptableException();
+        throw new NotAcceptableException(`Não é permitido atualizar mais esse abastecimento.`);
       }
     }
   }
@@ -134,7 +141,7 @@ export class AbastecimentoService {
       if (abastecimento.createdAt === formatedDate) {
         return this.repository.remove(abastecimento);
       } else {
-        throw new NotAcceptableException();
+        throw new NotAcceptableException(`Não é permitido remover mais esse abastecimento.`);
       }
     }
   }

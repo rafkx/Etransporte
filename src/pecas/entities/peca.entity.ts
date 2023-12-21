@@ -31,8 +31,19 @@ export class Peca {
     @JoinTable()
     pequenaPeca?: Peca[];
 
-    @ManyToOne(() => Fornecedor, (fornecedorP) => fornecedorP.peca, { eager: true })
-    fornecedorP: Fornecedor;
+    @ManyToMany(() => Fornecedor, (fornecedorP) => fornecedorP.peca, { eager: true })
+    @JoinTable({
+        name: 'peca_fornecedor',
+        joinColumn: {
+            name: 'peca_id',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'servico_id',
+            referencedColumnName: 'id'
+        }
+    })
+    fornecedorP: Fornecedor[];
 
     @ManyToMany(() => Veiculo, veiculos => veiculos.pecas, { eager: true })
     @JoinTable({

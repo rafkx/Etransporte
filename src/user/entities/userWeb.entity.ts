@@ -1,6 +1,5 @@
 import { BeforeInsert, Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { hashSync } from 'bcrypt';
-import { Role } from "src/enums/role.enum";
 import { Funcionario } from "src/funcionario/entities/funcionario.entity";
 
 @Entity()

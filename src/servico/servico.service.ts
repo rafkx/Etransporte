@@ -62,9 +62,8 @@ export class ServicoService {
     queryBuilder.take(pageOptionsDto.take);
     queryBuilder.leftJoinAndSelect('servico.fornecedor', 'fornecedor');
     queryBuilder.leftJoinAndSelect('servico.veiculo', 'veiculo');
-    queryBuilder.leftJoinAndSelect('veiculo.funcionarios', 'funcionario')
-    
-    queryBuilder.where('funcionario.id = :id', { id });
+    queryBuilder.leftJoinAndSelect('veiculo.autorizacao', 'autorizacao');
+    queryBuilder.where('autorizacao.funcionario.id = :id', { id });
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();

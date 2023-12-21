@@ -62,8 +62,8 @@ export class QuilometroService {
     const now = new Date();
     const queryBuilder = this.repository.createQueryBuilder('quilometro');
     queryBuilder.leftJoinAndSelect('quilometro.veiculo', 'veiculo');
-    queryBuilder.leftJoinAndSelect('veiculo.funcionarios', 'funcionario');
-    queryBuilder.where('funcionario.id = :id', { id })
+    queryBuilder.leftJoinAndSelect('veiculo.autorizacao', 'autorizacao');
+    queryBuilder.where('autorizacao.funcionario.id = :id', { id })
     .andWhere('DATE(quilometro.created_At) = :now', { now });
 
     const itemCount = await queryBuilder.getCount();
@@ -107,7 +107,7 @@ export class QuilometroService {
       if (quilometro.createdAt === formatedDate) {
         return this.repository.save(quilometro);
       } else {
-        throw new NotAcceptableException();
+        throw new NotAcceptableException(`Não é permitido atualizar mais essa quilometragem.`);
       }
     }
   }
@@ -128,7 +128,7 @@ export class QuilometroService {
       if (quilometro.createdAt === formatedDate) {
         return this.repository.remove(quilometro);
       } else {
-        throw new NotAcceptableException();
+        throw new NotAcceptableException(`Não é permitido remover mais essa quilometragem.`);
       }
     }
   }

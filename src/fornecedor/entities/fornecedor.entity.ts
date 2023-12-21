@@ -1,6 +1,7 @@
 import { Categoria } from "src/categoria/entities/categoria.entity";
 import { Contato } from "src/contato/entities/contato.entity";
 import { Entrada } from "src/entrada/entities/entrada.entity";
+import { ItemManutencao } from "src/manutencao/entities/item.manutencao";
 import { Peca } from "src/pecas/entities/peca.entity";
 import { Servico } from "src/servico/entities/servico.entity";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -31,9 +32,11 @@ export class Fornecedor {
     @OneToMany(() => Entrada, (entradas) => entradas.estoque )
     entradas: Entrada[];
 
-    @OneToMany(() => Peca, (peca) => peca.fornecedorP)
+    @ManyToMany(() => Peca, (peca) => peca.fornecedorP)
     peca: Peca[];
 
-    @OneToMany(() => Servico, (servicos) => servicos.fornecedor)
+    @ManyToMany(() => Servico, (servicos) => servicos.fornecedor)
     servicos: Servico[];
+
+    
 }

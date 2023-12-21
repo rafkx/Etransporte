@@ -23,6 +23,8 @@ import { FilesFuncionarioModule } from './files-funcionario/files-funcionario.mo
 import { FilesQuilometroModule } from './files-quilometro/files-quilometro.module';
 import { FilesServicoModule } from './files-servico/files-servico.module';
 import { FilesVeiculoModule } from './files-veiculo/files-veiculo.module';
+import { ManutencaoModule } from './manutencao/manutencao.module';
+import { FilterModule } from './filter/filter.module';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { FilesVeiculoModule } from './files-veiculo/files-veiculo.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: (process.env.DB_SYNCHRONIZE === 'true'),
     }),
+    FilterModule,
     FuncionarioModule,
     UserModule,
     AuthModule,
@@ -63,6 +66,7 @@ import { FilesVeiculoModule } from './files-veiculo/files-veiculo.module';
     FilesQuilometroModule,
     FilesServicoModule,
     FilesVeiculoModule,
+    ManutencaoModule,
   ],
   controllers: [],
   providers: [],

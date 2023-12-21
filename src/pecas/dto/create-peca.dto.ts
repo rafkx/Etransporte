@@ -30,7 +30,7 @@ export class CreatePecaDto {
     pequenaPeca?: Peca[];
     
     @IsNotEmpty()
-    fornecedorP: Fornecedor;
+    fornecedorP: Fornecedor[];
     
     @IsNotEmpty()
     veiculo: Veiculo[];

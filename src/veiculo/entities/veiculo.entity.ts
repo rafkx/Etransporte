@@ -1,7 +1,9 @@
 import { Abastecimento } from "src/abastecimento/entities/abastecimento.entity";
+import { AutorizacaoVeiculo } from "src/autorizacao-veiculo/autorizacao-veiculo.entity";
 import { Combustivel } from "src/combustivel/entities/combustivel.entity";
 import { FilesVeiculo } from "src/files-veiculo/entities/files-veiculo.entity";
 import { Funcionario } from "src/funcionario/entities/funcionario.entity";
+import { Manutencao } from "src/manutencao/entities/manutencao.entity";
 import { Peca } from "src/pecas/entities/peca.entity";
 import { Quilometro } from "src/quilometro/entities/quilometro.entity";
 import { Servico } from "src/servico/entities/servico.entity";
@@ -93,13 +95,16 @@ export class Veiculo {
     @OneToMany(() => FilesVeiculo, (files) => files.veiculo)
     files: FilesVeiculo[];
 
-    @ManyToMany(() => Funcionario, funcionario => funcionario.veiculos)
-    funcionarios: Funcionario[];
-
     @ManyToMany(() => Servico, servicos => servicos.veiculo)
     servicos: Servico[];
 
     @ManyToMany(() => Peca, pecas => pecas.veiculo)
     pecas: Peca[];
+
+    @OneToMany(() => AutorizacaoVeiculo, (autorizacao) => autorizacao.veiculo)
+    autorizacao: AutorizacaoVeiculo[];
+
+    @OneToMany(() => Manutencao, (manutencao) => manutencao.veiculo)
+    manutencao: Manutencao[];
 }
 

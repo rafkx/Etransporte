@@ -18,6 +18,6 @@ export class FilesFuncionario {
     @Column({ name: 'url', type: 'varchar', nullable: false })
     url: string;
 
-    @ManyToOne(() => Funcionario, (funcionario) => funcionario.files)
+    @ManyToOne(() => Funcionario, (funcionario) => funcionario.files, { onDelete: "CASCADE"})
     funcionario: Funcionario;
 }

@@ -19,6 +19,6 @@ export class FilesServico {
     @Column({ name: 'url', type: 'varchar', nullable: false })
     url: string;
 
-    @ManyToOne(() => Servico, (servico) => servico.files) 
+    @ManyToOne(() => Servico, (servico) => servico.files, { onDelete: "CASCADE"}) 
     servico: Servico;
 }

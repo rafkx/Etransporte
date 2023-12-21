@@ -1,3 +1,4 @@
+import { AutorizacaoVeiculo } from "src/autorizacao-veiculo/autorizacao-veiculo.entity";
 import { FilesFuncionario } from "src/files-funcionario/entities/files-funcionario.entity";
 import { Veiculo } from "src/veiculo/entities/veiculo.entity";
 import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -88,17 +89,6 @@ export class Funcionario extends BaseEntity {
     @OneToMany(() => FilesFuncionario, (files) => files.funcionario)
     files: FilesFuncionario[];
 
-    @ManyToMany(() => Veiculo, veiculos => veiculos.funcionarios)
-    @JoinTable({
-        name: 'funcionario_veiculo',
-        joinColumn: {
-            name: 'funcionario_id',
-            referencedColumnName: 'id',
-        },
-        inverseJoinColumn: {
-            name: 'veiculo_id',
-            referencedColumnName: 'id',
-        },
-    })
-    veiculos: Veiculo[];
+    @OneToMany(() => AutorizacaoVeiculo, (autorizacao) => autorizacao.funcionario)
+    autorizacao: AutorizacaoVeiculo[];
 }

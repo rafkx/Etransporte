@@ -10,6 +10,7 @@ import { PageOptionsDto } from 'src/dtos/page-options.dto';
 import { AuthUser } from 'src/auth/decorator/request.user.decorator';
 import { AuthService } from 'src/auth/auth.service';
 import { Payload } from 'src/DTOs/payload.dto';
+import { AutorizacaoVeiculoDto } from 'src/autorizacao-veiculo/dto/autorizacao-veiculo.dto';
 
 @Controller('veiculo')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -23,6 +24,12 @@ export class VeiculoController {
     const data = await this.veiculoService.create(createVeiculoDto);
     res.set('Location', '/veiculo/' + data.id);
     return data;
+  }
+
+  @Post('autorizacao')
+  @Roles(Role.Admin, Role.Gerente)
+  async createAutorizacaoVeiculo(@Body() autorizacao: AutorizacaoVeiculoDto) {
+    await this.veiculoService.createAutorizacaoVeiculo(autorizacao);
   }
 
   @Get('filter')
@@ -41,7 +48,6 @@ export class VeiculoController {
     @Query() pageOptionsDto: PageOptionsDto, 
     @AuthUser() user: Payload  
   ) {
-    console.log(user);
     if(user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
       return this.veiculoService.paginate(pageOptionsDto);
     } else {
@@ -49,10 +55,10 @@ export class VeiculoController {
     }
   }
 
-  @Get('available/:id')
-  @Roles(Role.Admin)
-  findAllVeiculos(@Param('id') id: string) {
-    return this.veiculoService.findAvailableVeiculos(id);
+  @Get('autorizacao')
+  @Roles(Role.Admin, Role.Gerente)
+  findAllAutorizacao() {
+    return this.veiculoService.findAllAutorizacao();
   }
 
   @Get()

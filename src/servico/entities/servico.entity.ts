@@ -1,7 +1,7 @@
 import { FilesServico } from "src/files-servico/entities/files-servico.entity";
 import { Fornecedor } from "src/fornecedor/entities/fornecedor.entity";
 import { Veiculo } from "src/veiculo/entities/veiculo.entity";
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Servico {
@@ -15,8 +15,19 @@ export class Servico {
     @Column({ name: 'cod', type: 'varchar', length: 50, unique: true })
     cod: string;
 
-    @ManyToOne(() => Fornecedor, (fornecedor) => fornecedor.servicos, { eager: true })
-    fornecedor: Fornecedor;
+    @ManyToMany(() => Fornecedor, (fornecedor) => fornecedor.servicos, { eager: true })
+    @JoinTable({
+        name: 'servico_fornecedor',
+        joinColumn: {
+            name: 'servico_id',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'fornecedor_id',
+            referencedColumnName: 'id'
+        }
+    })
+    fornecedor: Fornecedor[];
 
     @ManyToMany(() => Veiculo, veiculos => veiculos.servicos)
     @JoinTable({

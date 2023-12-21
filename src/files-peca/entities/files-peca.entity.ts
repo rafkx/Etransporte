@@ -19,6 +19,6 @@ export class FilesPeca {
     @Column({ name: 'url', type: 'varchar', nullable: false })
     url: string;
 
-    @ManyToOne(() => Peca, (peca) => peca.files)
+    @ManyToOne(() => Peca, (peca) => peca.files, { onDelete: "CASCADE"})
     peca: Peca;
 }

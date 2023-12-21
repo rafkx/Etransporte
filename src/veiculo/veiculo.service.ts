@@ -9,14 +9,32 @@ import { IPaginationOptions, Pagination, paginate, paginateRawAndEntities } from
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
 import { PageDto } from 'src/DTOs/page.dto';
 import { PageMetaDto } from 'src/DTOs/page-meta.dto';
+import { AutorizacaoVeiculo } from 'src/autorizacao-veiculo/autorizacao-veiculo.entity';
+import { AutorizacaoVeiculoDto } from 'src/autorizacao-veiculo/dto/autorizacao-veiculo.dto';
 
 @Injectable()
 export class VeiculoService {
-  constructor(@InjectRepository(Veiculo) private readonly repository: Repository<Veiculo>) {}
+  constructor(
+    @InjectRepository(Veiculo) private readonly repository: Repository<Veiculo>,
+    @InjectRepository(AutorizacaoVeiculo) private readonly autorizacaoRepository: Repository<AutorizacaoVeiculo>
+    ) {}
   
   create(createVeiculoDto: CreateVeiculoDto) {
     const veiculo = this.repository.create(createVeiculoDto);
     return this.repository.save(veiculo);
+  }
+
+  async createAutorizacaoVeiculo(autorizacao: AutorizacaoVeiculoDto): Promise<void> {
+    await this.autorizacaoRepository.save(autorizacao);
+  }
+
+  findAllAutorizacao(): Promise<AutorizacaoVeiculo[]> {
+    return this.autorizacaoRepository.find({
+      relations: {
+        funcionario: true,
+        veiculo: true,
+      }
+    });
   }
 
   async findVeiculoByPlaca(ano: number, text: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Veiculo>> {
@@ -49,12 +67,12 @@ export class VeiculoService {
     return new PageDto(entities, pageMetaDto);
   }
 
-  async findVeiculoByFuncionario(id: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Veiculo>> {
+  async findVeiculoByFuncionario(id: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Veiculo>> {  
     const queryBuilder = this.repository.createQueryBuilder('veiculo');
     queryBuilder.skip(pageOptionsDto.skip);
     queryBuilder.take(pageOptionsDto.take);
-    queryBuilder.leftJoinAndSelect('veiculo.funcionarios', 'funcionario');
-    queryBuilder.where('funcionario.id = :id', { id });
+    queryBuilder.leftJoinAndSelect('veiculo.autorizacao', 'autorizacao');
+    queryBuilder.where('autorizacao.funcionario.id = :id', { id });
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
@@ -77,20 +95,10 @@ export class VeiculoService {
     return new PageDto(entities, pageMetaDto);
   }
 
-  findAvailableVeiculos(id: string): Promise<Veiculo[]> {
-    return this.repository.find({
-      where: {
-        funcionarios: {
-          id: Not(id)
-        }
-      }
-    });
-  }
-
-  findAllByFuncionario(id: string): Promise<Veiculo[]> {
-    const queryBuilder = this.repository.createQueryBuilder('veiculo');
-    queryBuilder.leftJoinAndSelect('veiculo.funcionarios', 'funcionario');
-    queryBuilder.where('funcionario.id = :id', { id });
+  findAllByFuncionario(id: string): Promise<AutorizacaoVeiculo[]> {
+    const queryBuilder = this.autorizacaoRepository.createQueryBuilder('autorizacao');
+    queryBuilder.leftJoinAndSelect('autorizacao.veiculos', 'veiculo');
+    queryBuilder.where('autorizacao.funcionario.id = :id', { id });
 
     return queryBuilder.getMany();
   }
