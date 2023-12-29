@@ -58,7 +58,6 @@ export class PecasService {
     const queryBuilder = this.repository.createQueryBuilder('peca');
     queryBuilder.skip(pageOptionsDto.skip);
     queryBuilder.take(pageOptionsDto.take);
-    queryBuilder.leftJoinAndSelect('peca.fornecedorP', 'forncedorP');
     queryBuilder.leftJoinAndSelect('peca.veiculo', 'veiculo');
     queryBuilder.leftJoinAndSelect('veiculo.autorizacao', 'autorizacao');
     queryBuilder.where('autorizacao.funcionario.id = :id', { id });

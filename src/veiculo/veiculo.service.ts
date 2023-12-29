@@ -95,9 +95,9 @@ export class VeiculoService {
     return new PageDto(entities, pageMetaDto);
   }
 
-  findAllByFuncionario(id: string): Promise<AutorizacaoVeiculo[]> {
-    const queryBuilder = this.autorizacaoRepository.createQueryBuilder('autorizacao');
-    queryBuilder.leftJoinAndSelect('autorizacao.veiculos', 'veiculo');
+  findAllByFuncionario(id: string): Promise<Veiculo[]> {
+    const queryBuilder = this.repository.createQueryBuilder('veiculo');
+    queryBuilder.leftJoinAndSelect('veiculo.autorizacao', 'autorizacao');
     queryBuilder.where('autorizacao.funcionario.id = :id', { id });
 
     return queryBuilder.getMany();
