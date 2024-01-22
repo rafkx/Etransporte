@@ -9,6 +9,7 @@ import { Observable, from, map } from 'rxjs';
 import { PageDto } from 'src/DTOs/page.dto';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
 import { PageMetaDto } from 'src/DTOs/page-meta.dto';
+import { Request } from 'express';
 
 @Injectable()
 export class PecasService {
@@ -76,6 +77,18 @@ export class PecasService {
 
   findOne(id: string): Promise<Peca> {
     return this.repository.findOneBy({ id });
+  }
+
+  async updatePhoto(id: string, photo: Express.Multer.File, req: Request): Promise<Peca> {
+    const peca = await this.findOne(id);
+    
+    if (!peca) {
+      throw new NotFoundException(`Item ${id} not found`)
+    }
+
+    const url = `${req.protocol}://${req.get('host')}/files/peca/${photo.filename}`; 
+    peca.fotoPeca = url;
+    return this.repository.save(peca);
   }
 
   async update(id: string, updatePecaDto: UpdatePecaDto): Promise<Peca> {

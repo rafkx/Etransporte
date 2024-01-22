@@ -83,6 +83,9 @@ export class Veiculo {
     @Column({ name: 'descricao', type: 'varchar', length: 500 })
     descricao: string;
 
+    @Column({ nullable: true })
+    fotoCarro?: string;
+
     @ManyToOne(() => Combustivel, (combustivel) => combustivel.veiculo)
     combustivel: Combustivel;
 

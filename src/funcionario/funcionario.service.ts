@@ -7,6 +7,7 @@ import { Funcionario } from './entities/funcionario.entity';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
 import { PageDto } from 'src/DTOs/page.dto';
 import { PageMetaDto } from 'src/DTOs/page-meta.dto';
+import { Request } from 'express';
 
 @Injectable()
 export class FuncionarioService {
@@ -57,6 +58,18 @@ export class FuncionarioService {
 
   findOne(id: string): Promise<Funcionario> {
     return this.repository.findOneBy({id});
+  }
+
+  async updatePhoto(id: string, photo: Express.Multer.File, req: Request): Promise<Funcionario> {
+    const funcionario = await this.findOne(id);
+
+    if(!funcionario) {
+      throw new NotFoundException(`Item ${id} not found`)
+    }
+
+    const url = `${req.protocol}://${req.get('host')}/files/funcionario/${photo.filename}`; 
+    funcionario.fotoPerfil = url;
+    return this.repository.save(funcionario);
   }
 
   async update(id: string, updateFuncionarioDto: UpdateFuncionarioDto): Promise<Funcionario> {

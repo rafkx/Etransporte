@@ -86,6 +86,9 @@ export class Funcionario extends BaseEntity {
     @Column({ name: 'estadoCarteiraTrab', type: 'varchar', nullable: true, length: 100 })
     estadoCarteiraTrab?: string;
 
+    @Column({ nullable: true })
+    fotoPerfil: string;
+
     @OneToMany(() => FilesFuncionario, (files) => files.funcionario)
     files: FilesFuncionario[];
 

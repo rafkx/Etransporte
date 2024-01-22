@@ -2,7 +2,7 @@ import { ItemManutencaoPeca } from "src/manutencao/entities/item.manutencao.peca
 import { ItemManutencaoServico } from "src/manutencao/entities/item.manutencao.servico.entity";
 import { Quilometro } from "src/quilometro/entities/quilometro.entity";
 import { Veiculo } from "src/veiculo/entities/veiculo.entity";
-import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Manutencao {
@@ -15,7 +15,12 @@ export class Manutencao {
     @Column({ name: 'data', type: 'date' })
     data: Date;
 
-    @OneToOne(() => Quilometro)
+    @OneToOne(() => Quilometro, {
+        eager: true,
+        cascade: true,
+        onDelete: "CASCADE"
+    })
+    @JoinColumn()
     km: Quilometro;
 
     @Column({ name: 'tipo', type: 'varchar', length: 50})

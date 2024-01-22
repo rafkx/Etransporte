@@ -27,6 +27,9 @@ export class Peca {
     @Column({ name: 'modelo', type: 'varchar', length: 50 })
     modelo: string;
 
+    @Column({ nullable: true })
+    fotoPeca?: string;
+
     @ManyToMany(() => Peca)
     @JoinTable()
     pequenaPeca?: Peca[];
