@@ -7,8 +7,10 @@ import { Estoque } from './entities/estoque.entity';
 
 @Injectable()
 export class EstoqueService {
-  constructor(@InjectRepository(Estoque) private readonly repository: Repository<Estoque>) {}
-  
+  constructor(
+    @InjectRepository(Estoque) private readonly repository: Repository<Estoque>,
+  ) {}
+
   create(createEstoqueDto: CreateEstoqueDto) {
     const estoque = this.repository.create(createEstoqueDto);
     return this.repository.save(estoque);
@@ -19,16 +21,19 @@ export class EstoqueService {
   }
 
   findOne(id: string): Promise<Estoque> {
-    return this.repository.findOneBy({id});
+    return this.repository.findOneBy({ id });
   }
 
-  async update(id: string, updateEstoqueDto: UpdateEstoqueDto): Promise<Estoque> {
+  async update(
+    id: string,
+    updateEstoqueDto: UpdateEstoqueDto,
+  ): Promise<Estoque> {
     const estoque = await this.repository.preload({
       id: id,
       ...updateEstoqueDto,
     });
     if (!estoque) {
-      throw new NotFoundException(`Item ${id} not found`)
+      throw new NotFoundException(`Item ${id} not found`);
     }
     return this.repository.save(estoque);
   }

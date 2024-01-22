@@ -7,6 +7,6 @@ import { FilesServico } from './entities/files-servico.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([FilesServico])],
   controllers: [FilesServicoController],
-  providers: [FilesServicoService]
+  providers: [FilesServicoService],
 })
 export class FilesServicoModule {}

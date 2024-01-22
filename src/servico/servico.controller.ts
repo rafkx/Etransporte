@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, UseInterceptors, UploadedFiles, ClassSerializerInterceptor } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+  Query,
+  UseInterceptors,
+  UploadedFiles,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { ServicoService } from './servico.service';
 import { CreateServicoDto } from './dto/create-servico.dto';
 import { UpdateServicoDto } from './dto/update-servico.dto';
@@ -18,7 +31,10 @@ export class ServicoController {
 
   @Post()
   @Roles(Role.Admin, Role.Gerente)
-  async create(@Body() createServicoDto: CreateServicoDto, @Res({ passthrough: true }) res: Response ) {
+  async create(
+    @Body() createServicoDto: CreateServicoDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.servicoService.create(createServicoDto);
     res.set('location', '/servico/' + data.id);
     return data;
@@ -26,23 +42,20 @@ export class ServicoController {
 
   @Get('filter')
   @Roles(Role.Admin, Role.Gerente)
-  filter(
-    @Query('text') text: string,
-    @Query() pageOptionsDto: PageOptionsDto
-    ) {
+  filter(@Query('text') text: string, @Query() pageOptionsDto: PageOptionsDto) {
     return this.servicoService.findServico(text, pageOptionsDto);
   }
 
   @Get('paginate')
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  paginate(
-    @Query() pageOptionsDto: PageOptionsDto,
-    @AuthUser() user: Payload,
-  ) {
+  paginate(@Query() pageOptionsDto: PageOptionsDto, @AuthUser() user: Payload) {
     if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
       return this.servicoService.paginate(pageOptionsDto);
     } else {
-      return this.servicoService.findServicoByFuncionario(user.funcionario, pageOptionsDto);
+      return this.servicoService.findServicoByFuncionario(
+        user.funcionario,
+        pageOptionsDto,
+      );
     }
   }
 

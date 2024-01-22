@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, Req, StreamableFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UploadedFile,
+  UseInterceptors,
+  Req,
+  StreamableFile,
+} from '@nestjs/common';
 import { FilesQuilometroService } from './files-quilometro.service';
 import { CreateFilesQuilometroDto } from './dto/create-files-quilometro.dto';
 import { UpdateFilesQuilometroDto } from './dto/update-files-quilometro.dto';
@@ -14,27 +26,36 @@ import { FilesQuilometro } from './entities/files-quilometro.entity';
 @Controller('files-quilometro')
 @JwtAuth()
 export class FilesQuilometroController {
-  constructor(private readonly filesQuilometroService: FilesQuilometroService) {}
+  constructor(
+    private readonly filesQuilometroService: FilesQuilometroService,
+  ) {}
 
   @Post()
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './files/quilometro',
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = extname(file.originalname);
-        const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
-        callback(null, filename);
-      }
-    })
-  }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './files/quilometro',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
   handleUpload(
     @UploadedFile() file: Express.Multer.File,
     @Body() createFilesQuilometroDto: CreateFilesQuilometroDto,
-    @Req() req: Request
-    ): Promise<FilesQuilometro[]> {
-    return this.filesQuilometroService.salvarDados(file, createFilesQuilometroDto, req);
+    @Req() req: Request,
+  ): Promise<FilesQuilometro[]> {
+    return this.filesQuilometroService.salvarDados(
+      file,
+      createFilesQuilometroDto,
+      req,
+    );
   }
 
   @Get('download/:fileName')

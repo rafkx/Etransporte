@@ -1,12 +1,11 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateUnidadeDto {
-    
-    @IsString()
-    @IsNotEmpty()
-    nome: string;
+  @IsString()
+  @IsNotEmpty()
+  nome: string;
 
-    @IsString()
-    @IsNotEmpty()
-    sigla: string;
+  @IsString()
+  @IsNotEmpty()
+  sigla: string;
 }

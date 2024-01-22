@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+} from '@nestjs/common';
 import { CombustivelService } from './combustivel.service';
 import { CreateCombustivelDto } from './dto/create-combustivel.dto';
 import { UpdateCombustivelDto } from './dto/update-combustivel.dto';
@@ -14,9 +23,12 @@ export class CombustivelController {
 
   @Post()
   @Roles(Role.Admin)
-  async create(@Body() createCombustivelDto: CreateCombustivelDto, @Res({ passthrough: true }) res: Response ) {
+  async create(
+    @Body() createCombustivelDto: CreateCombustivelDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.combustivelService.create(createCombustivelDto);
-    res.set('location', '/combustivel/' + data.id)
+    res.set('location', '/combustivel/' + data.id);
     return data;
   }
 
@@ -34,7 +46,10 @@ export class CombustivelController {
 
   @Patch(':id')
   @Roles(Role.Admin)
-  update(@Param('id') id: string, @Body() updateCombustivelDto: UpdateCombustivelDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCombustivelDto: UpdateCombustivelDto,
+  ) {
     return this.combustivelService.update(id, updateCombustivelDto);
   }
 

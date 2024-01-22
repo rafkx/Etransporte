@@ -11,7 +11,9 @@ describe('FilesAbastecimentoController', () => {
       providers: [FilesAbastecimentoService],
     }).compile();
 
-    controller = module.get<FilesAbastecimentoController>(FilesAbastecimentoController);
+    controller = module.get<FilesAbastecimentoController>(
+      FilesAbastecimentoController,
+    );
   });
 
   it('should be defined', () => {

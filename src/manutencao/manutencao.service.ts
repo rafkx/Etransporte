@@ -11,15 +11,19 @@ import { PageMetaDto } from 'src/DTOs/page-meta.dto';
 @Injectable()
 export class ManutencaoService {
   constructor(
-    @InjectRepository(Manutencao) private readonly repository: Repository<Manutencao>
-    ) { }
+    @InjectRepository(Manutencao)
+    private readonly repository: Repository<Manutencao>,
+  ) {}
 
   create(createManutencaoDto: CreateManutencaoDto) {
     const manutencao = this.repository.create(createManutencaoDto);
     return this.repository.save(manutencao);
   }
 
-  async findManutencaoByDate(date: Date, pageOptionsDto: PageOptionsDto): Promise<PageDto<Manutencao>> {
+  async findManutencaoByDate(
+    date: Date,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Manutencao>> {
     const queryBuilder = this.repository.createQueryBuilder('manutencao');
     queryBuilder.skip(pageOptionsDto.skip);
     queryBuilder.take(pageOptionsDto.take);
@@ -30,11 +34,11 @@ export class ManutencaoService {
     const { entities } = await queryBuilder.getRawAndEntities();
 
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-    
+
     return new PageDto(entities, pageMetaDto);
   }
 
-  async paginate (pageOptionsDto: PageOptionsDto): Promise<PageDto<Manutencao>> {
+  async paginate(pageOptionsDto: PageOptionsDto): Promise<PageDto<Manutencao>> {
     const queryBuilder = this.repository.createQueryBuilder('manutencao');
     queryBuilder.skip(pageOptionsDto.skip);
     queryBuilder.take(pageOptionsDto.take);
@@ -53,17 +57,20 @@ export class ManutencaoService {
   }
 
   findOne(id: string) {
-    return this.repository.findOneBy({id});
+    return this.repository.findOneBy({ id });
   }
 
-  async update(id: string, updateManutencaoDto: UpdateManutencaoDto): Promise<Manutencao> {
+  async update(
+    id: string,
+    updateManutencaoDto: UpdateManutencaoDto,
+  ): Promise<Manutencao> {
     const manutencao = await this.repository.preload({
       id: id,
       ...updateManutencaoDto,
     });
 
     if (!manutencao) {
-      throw new NotFoundException(`Item ${id} not found`)
+      throw new NotFoundException(`Item ${id} not found`);
     }
 
     return this.repository.save(manutencao);

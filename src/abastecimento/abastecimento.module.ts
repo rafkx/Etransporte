@@ -8,9 +8,9 @@ import { MulterModule } from '@nestjs/platform-express';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Abastecimento]),
-   // MulterModule.register({ dest: './uploads' })
+    // MulterModule.register({ dest: './uploads' })
   ],
   controllers: [AbastecimentoController],
-  providers: [AbastecimentoService]
+  providers: [AbastecimentoService],
 })
 export class AbastecimentoModule {}

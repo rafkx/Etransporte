@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UploadedFiles, UseInterceptors, StreamableFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+  UploadedFiles,
+  UseInterceptors,
+  StreamableFile,
+} from '@nestjs/common';
 import { FilesVeiculoService } from './files-veiculo.service';
 import { CreateFilesVeiculoDto } from './dto/create-files-veiculo.dto';
 import { UpdateFilesVeiculoDto } from './dto/update-files-veiculo.dto';
@@ -20,25 +32,30 @@ export class FilesVeiculoController {
 
   @Post()
   @Roles(Role.Admin)
-  @UseInterceptors(FileFieldsInterceptor([
-    { name: 'file', maxCount: 5 },
-  ], {
-    storage: diskStorage({
-      destination: './files/veiculo',
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = extname(file.originalname);
-        const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
-        callback(null, filename)
-      }
-    })
-  }))
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'file', maxCount: 5 }], {
+      storage: diskStorage({
+        destination: './files/veiculo',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
   handleUpload(
-    @UploadedFiles() files: { file?: Express.Multer.File[] }, 
+    @UploadedFiles() files: { file?: Express.Multer.File[] },
     @Body() createFilesVeiculoDto: CreateFilesVeiculoDto,
-    @Req() req: Request
-    ): Promise<FilesVeiculo[]> {
-    return this.filesVeiculoService.salvarDados(files['file'], createFilesVeiculoDto, req);
+    @Req() req: Request,
+  ): Promise<FilesVeiculo[]> {
+    return this.filesVeiculoService.salvarDados(
+      files['file'],
+      createFilesVeiculoDto,
+      req,
+    );
   }
 
   @Get('download/:fileName')
@@ -55,7 +72,7 @@ export class FilesVeiculoController {
 
   @Delete(':fileName')
   @Roles(Role.Admin)
-  remove(@Param('fileName') fileName: string) {  
+  remove(@Param('fileName') fileName: string) {
     return this.filesVeiculoService.remove(fileName);
   }
 }

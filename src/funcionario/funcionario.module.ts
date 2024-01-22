@@ -9,6 +9,6 @@ import { AutorizacaoVeiculo } from 'src/autorizacao-veiculo/autorizacao-veiculo.
 @Module({
   imports: [TypeOrmModule.forFeature([Funcionario])],
   controllers: [FuncionarioController],
-  providers: [FuncionarioService]
+  providers: [FuncionarioService],
 })
 export class FuncionarioModule {}

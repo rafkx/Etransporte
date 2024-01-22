@@ -1,21 +1,21 @@
 import {
-    ArgumentsHost,
-    Catch,
-    ExceptionFilter,
-    HttpStatus,
-  } from '@nestjs/common';
-  import { Response } from 'express';
-  import { QueryFailedError } from 'typeorm';
-  
-  export const PG_UNIQUE_VIOLATION = '23505';
-  
-  // https://github.com/drdgvhbh/postgres-error-codes/blob/master/src/index.ts
-  
-  @Catch(QueryFailedError)
-  export class TypeOrmPostgresExceptionFilter implements ExceptionFilter {
-    catch(exception: QueryFailedError, host: ArgumentsHost) {
-      const ctx = host.switchToHttp();
-      const response = ctx.getResponse<Response>();
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpStatus,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { QueryFailedError } from 'typeorm';
+
+export const PG_UNIQUE_VIOLATION = '23505';
+
+// https://github.com/drdgvhbh/postgres-error-codes/blob/master/src/index.ts
+
+@Catch(QueryFailedError)
+export class TypeOrmPostgresExceptionFilter implements ExceptionFilter {
+  catch(exception: QueryFailedError, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
 
     const error = {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

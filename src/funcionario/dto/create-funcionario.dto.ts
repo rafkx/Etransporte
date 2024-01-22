@@ -1,109 +1,116 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsDate, IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
-import { Veiculo } from "src/veiculo/entities/veiculo.entity";
-
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsDate,
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
+import { Veiculo } from 'src/veiculo/entities/veiculo.entity';
 
 export class CreateFuncionarioDto {
+  @IsString()
+  @IsNotEmpty()
+  nomeFun: string;
 
-    @IsString()
-    @IsNotEmpty()
-    nomeFun: string;
+  @IsString()
+  @IsNotEmpty()
+  cpf: string;
 
-    @IsString()
-    @IsNotEmpty()
-    cpf: string;
+  @IsString()
+  @IsNotEmpty()
+  rg: string;
 
-    @IsString()
-    @IsNotEmpty()
-    rg: string;
+  @IsString()
+  @IsOptional()
+  telefone: string;
 
-    @IsString()
-    @IsOptional()
-    telefone: string;
-    
-    @IsString()
-    @IsOptional()
-    sexoFun: string;
+  @IsString()
+  @IsOptional()
+  sexoFun: string;
 
-    @IsNotEmpty()
-    dataNasciFun: Date;
-    
-    @IsString()
-    @IsOptional()
-    tituloEleitor: string;
-    
-    @IsString()
-    @IsOptional()
-    estadoCivil: string;
+  @IsNotEmpty()
+  dataNasciFun: Date;
 
-    @IsString()
-    @IsOptional()
-    grauInstrucao: string;
+  @IsString()
+  @IsOptional()
+  tituloEleitor: string;
 
-    @IsString()
-    @IsOptional()
-    rua: string;
+  @IsString()
+  @IsOptional()
+  estadoCivil: string;
 
-    @IsString()
-    @IsOptional()
-    bairro: string;
+  @IsString()
+  @IsOptional()
+  grauInstrucao: string;
 
-    @IsString()
-    @IsOptional()
-    cep: string;
+  @IsString()
+  @IsOptional()
+  rua: string;
 
-    @IsInt()
-    @IsOptional()
-    numero: number;
+  @IsString()
+  @IsOptional()
+  bairro: string;
 
-    @IsString()
-    @IsOptional()
-    city: string;
+  @IsString()
+  @IsOptional()
+  cep: string;
 
-    @IsString()
-    @IsNotEmpty()
-    funcao: string;
+  @IsInt()
+  @IsOptional()
+  numero: number;
 
-    @IsInt()
-    @Min(1)
-    @IsNotEmpty()
-    salario: number;
+  @IsString()
+  @IsOptional()
+  city: string;
 
-    @IsNotEmpty()
-    dataAdmissao: Date;
+  @IsString()
+  @IsNotEmpty()
+  funcao: string;
 
-    @IsString()
-    @IsOptional()
-    horarioTrabalho: string;
-    
-    @IsString()
-    @IsOptional()
-    intervaloTrabalho: string;
-    
-    @IsInt()
-    @Min(0)
-    @IsOptional()
-    contratoExpe: number;
-    
-    @IsInt()
-    @Min(0)
-    @IsOptional()
-    valeTrans: number;
-    
-    @IsInt()
-    @Min(0)
-    @IsOptional()
-    valeAlimen: number;
-    
-    @IsString()
-    @IsOptional()
-    numCarteiraTrab: string;
-    
-    @IsString()
-    @IsOptional()
-    serieCarteiraTrab: string;
+  @IsInt()
+  @Min(1)
+  @IsNotEmpty()
+  salario: number;
 
-    @IsString()
-    @IsOptional()
-    estadoCarteiraTrab: string;
+  @IsNotEmpty()
+  dataAdmissao: Date;
+
+  @IsString()
+  @IsOptional()
+  horarioTrabalho: string;
+
+  @IsString()
+  @IsOptional()
+  intervaloTrabalho: string;
+
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  contratoExpe: number;
+
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  valeTrans: number;
+
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  valeAlimen: number;
+
+  @IsString()
+  @IsOptional()
+  numCarteiraTrab: string;
+
+  @IsString()
+  @IsOptional()
+  serieCarteiraTrab: string;
+
+  @IsString()
+  @IsOptional()
+  estadoCarteiraTrab: string;
 }

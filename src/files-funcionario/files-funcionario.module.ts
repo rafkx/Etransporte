@@ -7,6 +7,6 @@ import { FilesFuncionario } from './entities/files-funcionario.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([FilesFuncionario])],
   controllers: [FilesFuncionarioController],
-  providers: [FilesFuncionarioService]
+  providers: [FilesFuncionarioService],
 })
 export class FilesFuncionarioModule {}

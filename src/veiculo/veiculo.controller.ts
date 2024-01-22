@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, UploadedFiles, UseInterceptors, ClassSerializerInterceptor, Req, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+  Query,
+  UploadedFiles,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  Req,
+  UploadedFile,
+} from '@nestjs/common';
 import { VeiculoService } from './veiculo.service';
 import { CreateVeiculoDto } from './dto/create-veiculo.dto';
 import { UpdateVeiculoDto } from './dto/update-veiculo.dto';
@@ -24,7 +39,10 @@ export class VeiculoController {
 
   @Post()
   @Roles(Role.Admin)
-  async create(@Body() createVeiculoDto: CreateVeiculoDto, @Res({ passthrough: true }) res: Response) {
+  async create(
+    @Body() createVeiculoDto: CreateVeiculoDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.veiculoService.create(createVeiculoDto);
     res.set('Location', '/veiculo/' + data.id);
     return data;
@@ -38,46 +56,49 @@ export class VeiculoController {
 
   @Post('photo/:id')
   @Roles(Role.Admin, Role.Gerente)
-  @UseInterceptors(FileInterceptor('photo', {
-    storage: diskStorage({
-      destination: './files/veiculo',
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = extname(file.originalname);
-        const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
-        callback(null, filename);
-      }
-    })
-  }))
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './files/veiculo',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
   async updatePhoto(
     @Param('id') id: string,
     @Req() req: Request,
     @UploadedFile() photo: Express.Multer.File,
   ): Promise<any> {
-    console.log(photo)
+    console.log(photo);
     return this.veiculoService.updatePhoto(id, photo, req);
   }
 
   @Get('filter')
   @Roles(Role.Admin, Role.Gerente)
   filter(
-    @Query('ano') ano: number, 
+    @Query('ano') ano: number,
     @Query('text') text: string,
     @Query() pageOptionsDto: PageOptionsDto,
-    ) {
-    return this.veiculoService.findVeiculoByPlaca(ano, text, pageOptionsDto)
+  ) {
+    return this.veiculoService.findVeiculoByPlaca(ano, text, pageOptionsDto);
   }
 
   @Get('paginate')
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  paginate(
-    @Query() pageOptionsDto: PageOptionsDto, 
-    @AuthUser() user: Payload  
-  ) {
-    if(user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
+  paginate(@Query() pageOptionsDto: PageOptionsDto, @AuthUser() user: Payload) {
+    if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
       return this.veiculoService.paginate(pageOptionsDto);
     } else {
-      return this.veiculoService.findVeiculoByFuncionario(user.funcionario, pageOptionsDto);
+      return this.veiculoService.findVeiculoByFuncionario(
+        user.funcionario,
+        pageOptionsDto,
+      );
     }
   }
 

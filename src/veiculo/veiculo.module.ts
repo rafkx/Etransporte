@@ -8,8 +8,11 @@ import { AuthService } from 'src/auth/auth.service';
 import { AutorizacaoVeiculo } from 'src/autorizacao-veiculo/autorizacao-veiculo.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Veiculo]), TypeOrmModule.forFeature([AutorizacaoVeiculo])],
+  imports: [
+    TypeOrmModule.forFeature([Veiculo]),
+    TypeOrmModule.forFeature([AutorizacaoVeiculo]),
+  ],
   controllers: [VeiculoController],
-  providers: [VeiculoService]
+  providers: [VeiculoService],
 })
 export class VeiculoModule {}

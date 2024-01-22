@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, UseInterceptors, UploadedFiles, ClassSerializerInterceptor, Req, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+  Query,
+  UseInterceptors,
+  UploadedFiles,
+  ClassSerializerInterceptor,
+  Req,
+  UploadedFile,
+} from '@nestjs/common';
 import { PecasService } from './pecas.service';
 import { CreatePecaDto } from './dto/create-peca.dto';
 import { UpdatePecaDto } from './dto/update-peca.dto';
@@ -21,7 +36,10 @@ export class PecasController {
 
   @Post()
   @Roles(Role.Admin, Role.Gerente)
-  async create(@Body() createPecaDto: CreatePecaDto, @Res({ passthrough: true }) res: Response) {
+  async create(
+    @Body() createPecaDto: CreatePecaDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.pecasService.create(createPecaDto);
     res.set('location', '/pecas/' + data.id);
     return data;
@@ -29,46 +47,45 @@ export class PecasController {
 
   @Post('photo/:id')
   @Roles(Role.Admin, Role.Gerente)
-  @UseInterceptors(FileInterceptor('photo', {
-    storage: diskStorage({
-      destination: './files/peca',
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = extname(file.originalname);
-        const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
-        callback(null, filename);
-      }
-    })
-  }))
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './files/peca',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
   async updatePhoto(
     @Param('id') id: string,
     @Req() req: Request,
     @UploadedFile() photo: Express.Multer.File,
   ): Promise<any> {
-    console.log(photo)
+    console.log(photo);
     return this.pecasService.updatePhoto(id, photo, req);
   }
 
   @Get('filter')
   @Roles(Role.Admin, Role.Gerente)
-  fiter(
-    @Query('text') text: string,
-    @Query() pageOptionsDto: PageOptionsDto,
-    ) {
+  fiter(@Query('text') text: string, @Query() pageOptionsDto: PageOptionsDto) {
     return this.pecasService.findPecaByName(text, pageOptionsDto);
-    
   }
 
   @Get('paginate')
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  paginate(
-    @Query() pageOptionsDto: PageOptionsDto,
-    @AuthUser() user: Payload  
-  ) {
+  paginate(@Query() pageOptionsDto: PageOptionsDto, @AuthUser() user: Payload) {
     if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
       return this.pecasService.paginate(pageOptionsDto);
     } else {
-      return this.pecasService.findPecaByFuncionario(user.funcionario, pageOptionsDto);
+      return this.pecasService.findPecaByFuncionario(
+        user.funcionario,
+        pageOptionsDto,
+      );
     }
   }
 

@@ -1,28 +1,27 @@
-import { IsEmail, IsNotEmpty, IsString, Matches } from "class-validator";
-import { Role } from "src/enums/role.enum";
-import { Funcionario } from "src/funcionario/entities/funcionario.entity";
-import { messagesHelper } from "src/helpers/messages.helper";
-import { regexHelper } from "src/helpers/regex.helper";
+import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
+import { Role } from 'src/enums/role.enum';
+import { Funcionario } from 'src/funcionario/entities/funcionario.entity';
+import { messagesHelper } from 'src/helpers/messages.helper';
+import { regexHelper } from 'src/helpers/regex.helper';
 
 export class CreateUserDto {
-    
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-    @IsString()
-    @IsNotEmpty()
-    role: string;
+  @IsString()
+  @IsNotEmpty()
+  role: string;
 
-    @IsNotEmpty()
-    @IsEmail()
-    email: string;
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @Matches(regexHelper.password, { message: messagesHelper.PASSWORD_VALID})
-    password: string;
+  @IsString()
+  @IsNotEmpty()
+  @Matches(regexHelper.password, { message: messagesHelper.PASSWORD_VALID })
+  password: string;
 
-    @IsNotEmpty()
-    funcionario: Funcionario;
+  @IsNotEmpty()
+  funcionario: Funcionario;
 }

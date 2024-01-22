@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ClassSerializerInterceptor, UseInterceptors, Res, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ClassSerializerInterceptor,
+  UseInterceptors,
+  Res,
+  Query,
+} from '@nestjs/common';
 import { ManutencaoService } from './manutencao.service';
 import { CreateManutencaoDto } from './dto/create-manutencao.dto';
 import { UpdateManutencaoDto } from './dto/update-manutencao.dto';
@@ -16,7 +28,10 @@ export class ManutencaoController {
 
   @Post()
   @Roles(Role.Admin, Role.Gerente)
-  async create(@Body() createManutencaoDto: CreateManutencaoDto, @Res({ passthrough: true }) res: Response) {
+  async create(
+    @Body() createManutencaoDto: CreateManutencaoDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.manutencaoService.create(createManutencaoDto);
     res.set('Location', '/manutencao/' + data.id);
     return data;
@@ -24,18 +39,13 @@ export class ManutencaoController {
 
   @Get('filter')
   @Roles(Role.Admin, Role.Gerente)
-  filter(
-    @Query('data') data: any,
-    @Query() pageOptionsDto: PageOptionsDto,
-  ) {
+  filter(@Query('data') data: any, @Query() pageOptionsDto: PageOptionsDto) {
     return this.manutencaoService.findManutencaoByDate(data, pageOptionsDto);
   }
 
   @Get('paginate')
   @Roles(Role.Admin, Role.Gerente)
-  paginate(
-    @Query() pageOptionsDto: PageOptionsDto,
-  ) {
+  paginate(@Query() pageOptionsDto: PageOptionsDto) {
     return this.manutencaoService.paginate(pageOptionsDto);
   }
 
@@ -53,7 +63,10 @@ export class ManutencaoController {
 
   @Patch(':id')
   @Roles(Role.Admin, Role.Gerente)
-  update(@Param('id') id: string, @Body() updateManutencaoDto: UpdateManutencaoDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateManutencaoDto: UpdateManutencaoDto,
+  ) {
     return this.manutencaoService.update(id, updateManutencaoDto);
   }
 

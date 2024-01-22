@@ -7,6 +7,6 @@ import { FilesAbastecimento } from './entities/files-abastecimento.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([FilesAbastecimento])],
   controllers: [FilesAbastecimentoController],
-  providers: [FilesAbastecimentoService]
+  providers: [FilesAbastecimentoService],
 })
 export class FilesAbastecimentoModule {}

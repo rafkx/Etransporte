@@ -11,7 +11,9 @@ describe('FilesFuncionarioController', () => {
       providers: [FilesFuncionarioService],
     }).compile();
 
-    controller = module.get<FilesFuncionarioController>(FilesFuncionarioController);
+    controller = module.get<FilesFuncionarioController>(
+      FilesFuncionarioController,
+    );
   });
 
   it('should be defined', () => {

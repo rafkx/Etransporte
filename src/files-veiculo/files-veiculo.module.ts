@@ -7,6 +7,6 @@ import { FilesVeiculo } from './entities/files-veiculo.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([FilesVeiculo])],
   controllers: [FilesVeiculoController],
-  providers: [FilesVeiculoService]
+  providers: [FilesVeiculoService],
 })
 export class FilesVeiculoModule {}

@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles, UseInterceptors, Req, StreamableFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UploadedFiles,
+  UseInterceptors,
+  Req,
+  StreamableFile,
+} from '@nestjs/common';
 import { FilesPecaService } from './files-peca.service';
 import { CreateFilesPecaDto } from './dto/create-files-peca.dto';
 import { UpdateFilesPecaDto } from './dto/update-files-peca.dto';
@@ -18,25 +30,30 @@ export class FilesPecaController {
 
   @Post()
   @Roles(Role.Admin, Role.Gerente)
-  @UseInterceptors(FileFieldsInterceptor([
-    { name: 'file', maxCount: 5 },
-  ], {
-    storage: diskStorage({
-      destination: './files/peca', 
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = extname(file.originalname);
-        const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
-        callback(null, filename)
-      }
-    })
-  }))
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'file', maxCount: 5 }], {
+      storage: diskStorage({
+        destination: './files/peca',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
   handleUpload(
     @UploadedFiles() files: { file?: Express.Multer.File[] },
     @Body() createFilesPecaDto: CreateFilesPecaDto,
-    @Req() req: Request
-    ): Promise<FilesPeca[]> {
-    return this.filesPecaService.salvarDados(files['file'], createFilesPecaDto, req);
+    @Req() req: Request,
+  ): Promise<FilesPeca[]> {
+    return this.filesPecaService.salvarDados(
+      files['file'],
+      createFilesPecaDto,
+      req,
+    );
   }
 
   @Get('download/:fileName')

@@ -9,8 +9,8 @@ import { ItemManutencaoServico } from './entities/item.manutencao.servico.entity
 @Module({
   imports: [
     TypeOrmModule.forFeature([Manutencao]),
-    TypeOrmModule.forFeature([ItemManutencaoPeca]), 
-    TypeOrmModule.forFeature([ItemManutencaoServico])
+    TypeOrmModule.forFeature([ItemManutencaoPeca]),
+    TypeOrmModule.forFeature([ItemManutencaoServico]),
   ],
   controllers: [ManutencaoController],
   providers: [ManutencaoService],

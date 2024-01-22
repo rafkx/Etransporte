@@ -7,7 +7,9 @@ import { Unidade } from './entities/unidade.entity';
 
 @Injectable()
 export class UnidadeService {
-  constructor(@InjectRepository(Unidade) private readonly repository: Repository<Unidade>) {}
+  constructor(
+    @InjectRepository(Unidade) private readonly repository: Repository<Unidade>,
+  ) {}
 
   create(createUnidadeDto: CreateUnidadeDto) {
     const unidade = this.repository.create(createUnidadeDto);
@@ -19,16 +21,19 @@ export class UnidadeService {
   }
 
   findOne(id: string): Promise<Unidade> {
-    return this.repository.findOneBy({id});
+    return this.repository.findOneBy({ id });
   }
 
-  async update(id: string, updateUnidadeDto: UpdateUnidadeDto): Promise<Unidade> {
+  async update(
+    id: string,
+    updateUnidadeDto: UpdateUnidadeDto,
+  ): Promise<Unidade> {
     const unidade = await this.repository.preload({
       id: id,
       ...updateUnidadeDto,
     });
     if (!unidade) {
-      throw new NotFoundException(`Item ${id} not found`)
+      throw new NotFoundException(`Item ${id} not found`);
     }
     return this.repository.save(unidade);
   }

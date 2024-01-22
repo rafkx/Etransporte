@@ -7,8 +7,11 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class CombustivelService {
-  constructor(@InjectRepository(Combustivel) private readonly repository: Repository<Combustivel>) { }
-  
+  constructor(
+    @InjectRepository(Combustivel)
+    private readonly repository: Repository<Combustivel>,
+  ) {}
+
   create(createCombustivelDto: CreateCombustivelDto): Promise<Combustivel> {
     const combustivel = this.repository.create(createCombustivelDto);
     return this.repository.save(combustivel);
@@ -22,13 +25,16 @@ export class CombustivelService {
     return this.repository.findOneBy({ id });
   }
 
-  async update(id: string, updateCombustivelDto: UpdateCombustivelDto): Promise<Combustivel> {
+  async update(
+    id: string,
+    updateCombustivelDto: UpdateCombustivelDto,
+  ): Promise<Combustivel> {
     const combustivel = await this.repository.preload({
       id: id,
       ...updateCombustivelDto,
     });
     if (!combustivel) {
-      throw new NotFoundException(`Item ${id} not found`)
+      throw new NotFoundException(`Item ${id} not found`);
     }
     return this.repository.save(combustivel);
   }

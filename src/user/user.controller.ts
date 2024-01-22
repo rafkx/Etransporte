@@ -1,4 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, UseGuards, Res, Query, ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+  UseGuards,
+  Res,
+  Query,
+  ClassSerializerInterceptor,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -18,21 +32,20 @@ export class UserController {
 
   @Post()
   @Roles(Role.Admin)
-  async create(@Body() createUserDto: CreateUserDto, @Res({ passthrough: true }) res: Response) {
+  async create(
+    @Body() createUserDto: CreateUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.userService.create(createUserDto);
-    res.set('location', '/user/' + data.id)
+    res.set('location', '/user/' + data.id);
     return data;
   }
 
   @Get('filter')
   @Roles(Role.Admin)
-  filter(
-    @Query('text') text: string,
-    @Query() pageOptionsDto: PageOptionsDto,
-  ) {
+  filter(@Query('text') text: string, @Query() pageOptionsDto: PageOptionsDto) {
     return this.userService.findUsername(text, pageOptionsDto);
   }
-
 
   @Get('paginate')
   @Roles(Role.Admin)
@@ -54,10 +67,7 @@ export class UserController {
 
   @Patch()
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  update(
-    @Body() updateUserDto: UpdateUserDto,
-    @AuthUser() user: Payload
-  ) {
+  update(@Body() updateUserDto: UpdateUserDto, @AuthUser() user: Payload) {
     return this.userService.update(user.email, updateUserDto);
   }
 

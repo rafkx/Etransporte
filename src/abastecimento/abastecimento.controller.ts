@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseInterceptors, UploadedFile, Query, ClassSerializerInterceptor } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+  UseInterceptors,
+  UploadedFile,
+  Query,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -21,37 +34,40 @@ export class AbastecimentoController {
 
   @Post()
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  async create(@Body() createAbastecimentoDto: CreateAbastecimentoDto, @Res({ passthrough: true }) res: Response ) {
+  async create(
+    @Body() createAbastecimentoDto: CreateAbastecimentoDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.abastecimentoService.create(createAbastecimentoDto);
-    res.set('location', '/abastecimento/' + data.id)
+    res.set('location', '/abastecimento/' + data.id);
     return data;
   }
 
   @Get('filter')
   @Roles(Role.Admin, Role.Gerente)
   filter(
-    @Query('data') data: any, 
+    @Query('data') data: any,
     @Query('text') text: string,
     @Query() pageOptionsDto: PageOptionsDto,
-    ) {
+  ) {
     return this.abastecimentoService.findAbastecimentoByDate(
       data,
       text,
-      pageOptionsDto
-    )
+      pageOptionsDto,
+    );
   }
 
   @Get('paginate')
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  paginate(
-    @Query() pageOptionsDto: PageOptionsDto,
-    @AuthUser() user: Payload  
-  ) {
+  paginate(@Query() pageOptionsDto: PageOptionsDto, @AuthUser() user: Payload) {
     if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
       return this.abastecimentoService.paginate(pageOptionsDto);
     } else {
-      return this.abastecimentoService.findAbastecimentoByFuncionario(user.funcionario, pageOptionsDto);
-    } 
+      return this.abastecimentoService.findAbastecimentoByFuncionario(
+        user.funcionario,
+        pageOptionsDto,
+      );
+    }
   }
 
   @Get()
@@ -69,9 +85,9 @@ export class AbastecimentoController {
   @Patch(':id')
   @Roles(Role.Admin, Role.User, Role.Gerente)
   update(
-    @Param('id') id: string, 
+    @Param('id') id: string,
     @Body() updateAbastecimentoDto: UpdateAbastecimentoDto,
-    @AuthUser() user: Payload,  
+    @AuthUser() user: Payload,
   ) {
     if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
       return this.abastecimentoService.update(id, updateAbastecimentoDto);
@@ -82,10 +98,7 @@ export class AbastecimentoController {
 
   @Delete(':id')
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  remove(
-    @Param('id') id: string,
-    @AuthUser() user: Payload  
-  ) {
+  remove(@Param('id') id: string, @AuthUser() user: Payload) {
     if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
       return this.abastecimentoService.remove(id);
     } else {

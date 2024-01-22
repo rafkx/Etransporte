@@ -7,6 +7,6 @@ import { Saida } from './entities/saida.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Saida])],
   controllers: [SaidaController],
-  providers: [SaidaService]
+  providers: [SaidaService],
 })
 export class SaidaModule {}

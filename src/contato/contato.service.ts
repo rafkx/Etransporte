@@ -7,7 +7,9 @@ import { Contato } from './entities/contato.entity';
 
 @Injectable()
 export class ContatoService {
-  constructor(@InjectRepository(Contato) private readonly repository: Repository<Contato>) {}
+  constructor(
+    @InjectRepository(Contato) private readonly repository: Repository<Contato>,
+  ) {}
 
   create(createContatoDto: CreateContatoDto) {
     const contato = this.repository.create(createContatoDto);
@@ -22,13 +24,16 @@ export class ContatoService {
     return this.repository.findOneBy({ id });
   }
 
-  async update(id: string, updateContatoDto: UpdateContatoDto): Promise<Contato> {
-    const contato = await this.repository.preload ({
+  async update(
+    id: string,
+    updateContatoDto: UpdateContatoDto,
+  ): Promise<Contato> {
+    const contato = await this.repository.preload({
       id: id,
       ...updateContatoDto,
-    })
+    });
     if (!contato) {
-      throw new NotFoundException(`Item ${id} not found`)
+      throw new NotFoundException(`Item ${id} not found`);
     }
     return this.repository.save(contato);
   }

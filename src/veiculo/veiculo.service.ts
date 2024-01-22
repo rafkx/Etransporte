@@ -15,15 +15,18 @@ import { Request } from 'express';
 export class VeiculoService {
   constructor(
     @InjectRepository(Veiculo) private readonly repository: Repository<Veiculo>,
-    @InjectRepository(AutorizacaoVeiculo) private readonly autorizacaoRepository: Repository<AutorizacaoVeiculo>
-    ) {}
-  
+    @InjectRepository(AutorizacaoVeiculo)
+    private readonly autorizacaoRepository: Repository<AutorizacaoVeiculo>,
+  ) {}
+
   create(createVeiculoDto: CreateVeiculoDto) {
     const veiculo = this.repository.create(createVeiculoDto);
     return this.repository.save(veiculo);
   }
 
-  async createAutorizacaoVeiculo(autorizacao: AutorizacaoVeiculoDto): Promise<void> {
+  async createAutorizacaoVeiculo(
+    autorizacao: AutorizacaoVeiculoDto,
+  ): Promise<void> {
     await this.autorizacaoRepository.save(autorizacao);
   }
 
@@ -32,30 +35,36 @@ export class VeiculoService {
       relations: {
         funcionario: true,
         veiculo: true,
-      }
+      },
     });
   }
 
-  async findVeiculoByPlaca(ano: number, text: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Veiculo>> {
+  async findVeiculoByPlaca(
+    ano: number,
+    text: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Veiculo>> {
     const queryBuilder = this.repository.createQueryBuilder('veiculo');
     queryBuilder.skip(pageOptionsDto.skip);
     queryBuilder.take(pageOptionsDto.take);
 
     if (ano && text) {
       queryBuilder.where('veiculo.ano = :ano', { ano });
-      queryBuilder.andWhere('veiculo.placa LIKE :text', { text: `%${text}%` })
-      .orWhere('veiculo.marca LIKE :text', { text: `%${text}%` })
-      .orWhere('veiculo.modelo LIKE :text', { text: `%${text}%` });
+      queryBuilder
+        .andWhere('veiculo.placa LIKE :text', { text: `%${text}%` })
+        .orWhere('veiculo.marca LIKE :text', { text: `%${text}%` })
+        .orWhere('veiculo.modelo LIKE :text', { text: `%${text}%` });
     }
-    
+
     if (ano) {
       queryBuilder.where('veiculo.ano = :ano', { ano });
     }
 
     if (text) {
-      queryBuilder.where('veiculo.placa LIKE :text', { text: `%${text}%` })
-      .orWhere('veiculo.marca LIKE :text', { text: `%${text}%` })
-      .orWhere('veiculo.modelo LIKE :text', { text: `%${text}%` });
+      queryBuilder
+        .where('veiculo.placa LIKE :text', { text: `%${text}%` })
+        .orWhere('veiculo.marca LIKE :text', { text: `%${text}%` })
+        .orWhere('veiculo.modelo LIKE :text', { text: `%${text}%` });
     }
 
     const itemCount = await queryBuilder.getCount();
@@ -66,7 +75,10 @@ export class VeiculoService {
     return new PageDto(entities, pageMetaDto);
   }
 
-  async findVeiculoByFuncionario(id: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Veiculo>> {  
+  async findVeiculoByFuncionario(
+    id: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Veiculo>> {
     const queryBuilder = this.repository.createQueryBuilder('veiculo');
     queryBuilder.skip(pageOptionsDto.skip);
     queryBuilder.take(pageOptionsDto.take);
@@ -76,7 +88,7 @@ export class VeiculoService {
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
 
-    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto })
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
 
     return new PageDto(entities, pageMetaDto);
   }
@@ -107,28 +119,37 @@ export class VeiculoService {
   }
 
   findOne(id: string) {
-    return this.repository.findOneBy({id});
+    return this.repository.findOneBy({ id });
   }
 
-  async updatePhoto(id: string, photo: Express.Multer.File, req: Request): Promise<Veiculo> {
+  async updatePhoto(
+    id: string,
+    photo: Express.Multer.File,
+    req: Request,
+  ): Promise<Veiculo> {
     const veiculo = await this.findOne(id);
 
     if (!veiculo) {
-      throw new NotFoundException(`Item ${id} not found`)
+      throw new NotFoundException(`Item ${id} not found`);
     }
 
-    const url = `${req.protocol}://${req.get('host')}/files/veiculo/${photo.filename}`;
+    const url = `${req.protocol}://${req.get('host')}/files/veiculo/${
+      photo.filename
+    }`;
     veiculo.fotoCarro = url;
     return this.repository.save(veiculo);
   }
 
-  async update(id: string, updateVeiculoDto: UpdateVeiculoDto): Promise<Veiculo> {
+  async update(
+    id: string,
+    updateVeiculoDto: UpdateVeiculoDto,
+  ): Promise<Veiculo> {
     const veiculo = await this.repository.preload({
       id: id,
       ...updateVeiculoDto,
     });
     if (!veiculo) {
-      throw new NotFoundException(`Item ${id} not found`)
+      throw new NotFoundException(`Item ${id} not found`);
     }
     return this.repository.save(veiculo);
   }

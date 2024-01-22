@@ -4,7 +4,11 @@ import { Like, Repository } from 'typeorm';
 import { CreatePecaDto } from './dto/create-peca.dto';
 import { UpdatePecaDto } from './dto/update-peca.dto';
 import { Peca } from './entities/peca.entity';
-import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
+import {
+  IPaginationOptions,
+  Pagination,
+  paginate,
+} from 'nestjs-typeorm-paginate';
 import { Observable, from, map } from 'rxjs';
 import { PageDto } from 'src/DTOs/page.dto';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
@@ -13,30 +17,36 @@ import { Request } from 'express';
 
 @Injectable()
 export class PecasService {
-  constructor(@InjectRepository(Peca) private readonly repository: Repository<Peca>) {}
+  constructor(
+    @InjectRepository(Peca) private readonly repository: Repository<Peca>,
+  ) {}
 
   create(createPecaDto: CreatePecaDto) {
     const peca = this.repository.create(createPecaDto);
     return this.repository.save(peca);
   }
 
-  async findPecaByName(text: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Peca>> {
+  async findPecaByName(
+    text: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Peca>> {
     const queryBuilder = this.repository.createQueryBuilder('pecas');
     queryBuilder.skip(pageOptionsDto.skip);
     queryBuilder.take(pageOptionsDto.take);
     queryBuilder.leftJoinAndSelect('pecas.fornecedorP', 'fornecedorP');
 
     if (text) {
-      queryBuilder.where('pecas.nomePeca LIKE :text', { text: `%${text}%` })
-      .orWhere('pecas.descricao LIKE :text', { text: `%${text}%` })
-      .orWhere('pecas.codPeca LIKE :text', { text: `%${text}%` })
-      .orWhere('fornecedorP.nome LIKE :text', { text: `%${text}%` })
+      queryBuilder
+        .where('pecas.nomePeca LIKE :text', { text: `%${text}%` })
+        .orWhere('pecas.descricao LIKE :text', { text: `%${text}%` })
+        .orWhere('pecas.codPeca LIKE :text', { text: `%${text}%` })
+        .orWhere('fornecedorP.nome LIKE :text', { text: `%${text}%` });
     }
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
 
-    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto })
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
 
     return new PageDto(entities, pageMetaDto);
   }
@@ -55,7 +65,10 @@ export class PecasService {
     return new PageDto(entities, pageMetaDto);
   }
 
-  async findPecaByFuncionario(id: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Peca>> {
+  async findPecaByFuncionario(
+    id: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Peca>> {
     const queryBuilder = this.repository.createQueryBuilder('peca');
     queryBuilder.skip(pageOptionsDto.skip);
     queryBuilder.take(pageOptionsDto.take);
@@ -79,23 +92,29 @@ export class PecasService {
     return this.repository.findOneBy({ id });
   }
 
-  async updatePhoto(id: string, photo: Express.Multer.File, req: Request): Promise<Peca> {
+  async updatePhoto(
+    id: string,
+    photo: Express.Multer.File,
+    req: Request,
+  ): Promise<Peca> {
     const peca = await this.findOne(id);
-    
+
     if (!peca) {
-      throw new NotFoundException(`Item ${id} not found`)
+      throw new NotFoundException(`Item ${id} not found`);
     }
 
-    const url = `${req.protocol}://${req.get('host')}/files/peca/${photo.filename}`; 
+    const url = `${req.protocol}://${req.get('host')}/files/peca/${
+      photo.filename
+    }`;
     peca.fotoPeca = url;
     return this.repository.save(peca);
   }
 
   async update(id: string, updatePecaDto: UpdatePecaDto): Promise<Peca> {
-    const peca = await this.repository.preload ({
+    const peca = await this.repository.preload({
       id: id,
       ...updatePecaDto,
-    })
+    });
     if (!peca) {
       throw new NotFoundException(`Item ${id} not found`);
     }

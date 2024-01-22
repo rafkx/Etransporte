@@ -7,6 +7,6 @@ import { Quilometro } from './entities/quilometro.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Quilometro])],
   controllers: [QuilometroController],
-  providers: [QuilometroService]
+  providers: [QuilometroService],
 })
 export class QuilometroModule {}

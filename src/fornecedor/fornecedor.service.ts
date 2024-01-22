@@ -4,7 +4,11 @@ import { Repository } from 'typeorm';
 import { CreateFornecedorDto } from './dto/create-fornecedor.dto';
 import { UpdateFornecedorDto } from './dto/update-fornecedor.dto';
 import { Fornecedor } from './entities/fornecedor.entity';
-import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
+import {
+  IPaginationOptions,
+  Pagination,
+  paginate,
+} from 'nestjs-typeorm-paginate';
 import { Observable, from, map } from 'rxjs';
 import { Veiculo } from 'src/veiculo/entities/veiculo.entity';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
@@ -13,23 +17,29 @@ import { PageMetaDto } from 'src/DTOs/page-meta.dto';
 
 @Injectable()
 export class FornecedorService {
-  constructor(@InjectRepository(Fornecedor) private readonly repository: Repository<Fornecedor>) {}
+  constructor(
+    @InjectRepository(Fornecedor)
+    private readonly repository: Repository<Fornecedor>,
+  ) {}
 
   create(createFornecedorDto: CreateFornecedorDto) {
     const fornecedor = this.repository.create(createFornecedorDto);
     return this.repository.save(fornecedor);
-    
   }
 
-  async search(text: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Fornecedor>> {
+  async search(
+    text: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Fornecedor>> {
     const queryBuilder = this.repository.createQueryBuilder('fornecedor');
     queryBuilder.skip(pageOptionsDto.skip);
     queryBuilder.take(pageOptionsDto.take);
     queryBuilder.leftJoinAndSelect('fornecedor.contatos', 'contatos');
 
     if (text) {
-      queryBuilder.where('fornecedor.nome LIKE :text', {text: `%${text}%`})
-      .orWhere('contatos.apelido LIKE :text', {text: `%${text}%`})
+      queryBuilder
+        .where('fornecedor.nome LIKE :text', { text: `%${text}%` })
+        .orWhere('contatos.apelido LIKE :text', { text: `%${text}%` });
     }
 
     const itemCount = await queryBuilder.getCount();
@@ -59,15 +69,18 @@ export class FornecedorService {
   }
 
   findOne(id: string): Promise<Fornecedor> {
-    return this.repository.findOneBy({id});
+    return this.repository.findOneBy({ id });
   }
 
-  async update(id: string, updateFornecedorDto: UpdateFornecedorDto): Promise<Fornecedor> {
+  async update(
+    id: string,
+    updateFornecedorDto: UpdateFornecedorDto,
+  ): Promise<Fornecedor> {
     const fornecedor = await this.repository.preload({
       id: id,
       ...updateFornecedorDto,
     });
-    if (!fornecedor){
+    if (!fornecedor) {
       throw new NotFoundException(`Item ${id} not found`);
     }
     return this.repository.save(fornecedor);

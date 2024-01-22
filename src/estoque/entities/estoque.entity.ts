@@ -1,27 +1,37 @@
-import { Entrada } from "src/entrada/entities/entrada.entity";
-import { Saida } from "src/saida/entities/saida.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Entrada } from 'src/entrada/entities/entrada.entity';
+import { Saida } from 'src/saida/entities/saida.entity';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Estoque {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @UpdateDateColumn({ name: 'update_at', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-    updateAt: Date;
-    
-    @Column({ name: 'nome', type: 'varchar', length: 50})
-    nome: string;
+  @UpdateDateColumn({
+    name: 'update_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updateAt: Date;
 
-    @Column({ name: 'desc', type: 'varchar', length: 500})
-    desc: string;
+  @Column({ name: 'nome', type: 'varchar', length: 50 })
+  nome: string;
 
-    @Column({ name: 'localizacao', type: 'varchar', length: 50})
-    localizacao: string;
+  @Column({ name: 'desc', type: 'varchar', length: 500 })
+  desc: string;
 
-    @OneToMany(() => Entrada, (entradas) => entradas.estoque)
-    entradas: Entrada[];
+  @Column({ name: 'localizacao', type: 'varchar', length: 50 })
+  localizacao: string;
 
-    @OneToMany(() => Saida, (saidas) => saidas.estoque)
-    saidas: Saida[];
+  @OneToMany(() => Entrada, (entradas) => entradas.estoque)
+  entradas: Entrada[];
+
+  @OneToMany(() => Saida, (saidas) => saidas.estoque)
+  saidas: Saida[];
 }

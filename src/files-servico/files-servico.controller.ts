@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UploadedFiles, UseInterceptors, StreamableFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+  UploadedFiles,
+  UseInterceptors,
+  StreamableFile,
+} from '@nestjs/common';
 import { FilesServicoService } from './files-servico.service';
 import { CreateFilesServicoDto } from './dto/create-files-servico.dto';
 import { UpdateFilesServicoDto } from './dto/update-files-servico.dto';
@@ -18,25 +30,30 @@ export class FilesServicoController {
 
   @Post()
   @Roles(Role.Admin, Role.Gerente)
-  @UseInterceptors(FileFieldsInterceptor([
-    { name: 'file', maxCount: 5 }
-  ], {
-    storage: diskStorage({
-      destination: './files/servico',
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = extname(file.originalname);
-        const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
-        callback(null, filename)
-      }
-    })
-  }))
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'file', maxCount: 5 }], {
+      storage: diskStorage({
+        destination: './files/servico',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
   handleUpload(
     @UploadedFiles() files: { file?: Express.Multer.File[] },
     @Body() createFilesServicoDto: CreateFilesServicoDto,
-    @Req() req: Request
-    ): Promise<FilesServico[]> {
-    return this.filesServicoService.salvarDados(files['file'], createFilesServicoDto, req);
+    @Req() req: Request,
+  ): Promise<FilesServico[]> {
+    return this.filesServicoService.salvarDados(
+      files['file'],
+      createFilesServicoDto,
+      req,
+    );
   }
 
   @Get('download/:fileName')

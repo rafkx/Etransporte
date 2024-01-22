@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+  Query,
+  ClassSerializerInterceptor,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FornecedorService } from './fornecedor.service';
 import { CreateFornecedorDto } from './dto/create-fornecedor.dto';
 import { UpdateFornecedorDto } from './dto/update-fornecedor.dto';
@@ -19,20 +31,20 @@ export class FornecedorController {
 
   @Post()
   @Roles(Role.Admin, Role.Gerente)
-  async create(@Body() createFornecedorDto: CreateFornecedorDto, @Res({ passthrough: true }) res: Response) {
+  async create(
+    @Body() createFornecedorDto: CreateFornecedorDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.fornecedorService.create(createFornecedorDto);
-    res.set('location', '/fornecedor/' + data.id)
+    res.set('location', '/fornecedor/' + data.id);
     return data;
   }
 
   @Get('filter')
   @Roles(Role.Admin, Role.Gerente)
-  filter(
-    @Query('text') text: string,
-    @Query() pageOptionsDto: PageOptionsDto,
-    ) {
-      return this.fornecedorService.search(text, pageOptionsDto)
-    }
+  filter(@Query('text') text: string, @Query() pageOptionsDto: PageOptionsDto) {
+    return this.fornecedorService.search(text, pageOptionsDto);
+  }
 
   @Get('paginate')
   @Roles(Role.Admin, Role.User, Role.Gerente)
@@ -54,7 +66,10 @@ export class FornecedorController {
 
   @Patch(':id')
   @Roles(Role.Admin, Role.Gerente)
-  update(@Param('id') id: string, @Body() updateFornecedorDto: UpdateFornecedorDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateFornecedorDto: UpdateFornecedorDto,
+  ) {
     return this.fornecedorService.update(id, updateFornecedorDto);
   }
 

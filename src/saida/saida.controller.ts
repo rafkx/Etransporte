@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { SaidaService } from './saida.service';
 import { CreateSaidaDto } from './dto/create-saida.dto';
 import { UpdateSaidaDto } from './dto/update-saida.dto';

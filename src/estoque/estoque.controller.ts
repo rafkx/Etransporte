@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+} from '@nestjs/common';
 import { EstoqueService } from './estoque.service';
 import { CreateEstoqueDto } from './dto/create-estoque.dto';
 import { UpdateEstoqueDto } from './dto/update-estoque.dto';
@@ -14,7 +23,10 @@ export class EstoqueController {
 
   @Post()
   @Roles(Role.Admin)
-  async create(@Body() createEstoqueDto: CreateEstoqueDto, @Res({ passthrough: true }) res: Response) {
+  async create(
+    @Body() createEstoqueDto: CreateEstoqueDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.estoqueService.create(createEstoqueDto);
     res.set('location', '/estoque/' + data.id);
     return data;

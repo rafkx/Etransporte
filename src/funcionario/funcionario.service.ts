@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateFuncionarioDto } from './dto/create-funcionario.dto';
@@ -12,34 +16,41 @@ import { Request } from 'express';
 @Injectable()
 export class FuncionarioService {
   constructor(
-    @InjectRepository(Funcionario) private readonly repository: Repository<Funcionario>
-    ) {}
-  
+    @InjectRepository(Funcionario)
+    private readonly repository: Repository<Funcionario>,
+  ) {}
+
   create(createFuncionarioDto: CreateFuncionarioDto): Promise<Funcionario> {
     const funcionario = this.repository.create(createFuncionarioDto);
     return this.repository.save(funcionario);
   }
 
-  async search(text: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Funcionario>> { 
+  async search(
+    text: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Funcionario>> {
     const queryBuilder = this.repository.createQueryBuilder('funcionario');
     queryBuilder.skip(pageOptionsDto.skip);
     queryBuilder.take(pageOptionsDto.take);
 
     if (text) {
-      queryBuilder.where('funcionario.nomeFun LIKE :text', { text: `%${text}%`})
-      .orWhere('funcionario.cpf LIKE :text', { text: `%${text}%`})
-      .orWhere('funcionario.funcao LIKE :text', { text: `%${text}%`})
+      queryBuilder
+        .where('funcionario.nomeFun LIKE :text', { text: `%${text}%` })
+        .orWhere('funcionario.cpf LIKE :text', { text: `%${text}%` })
+        .orWhere('funcionario.funcao LIKE :text', { text: `%${text}%` });
     }
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
 
-    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto })
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
 
     return new PageDto(entities, pageMetaDto);
   }
 
-  async paginate(pageOptionsDto: PageOptionsDto): Promise<PageDto<Funcionario>> {
+  async paginate(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Funcionario>> {
     const queryBuilder = this.repository.createQueryBuilder('funcionario');
     queryBuilder.skip(pageOptionsDto.skip);
     queryBuilder.take(pageOptionsDto.take);
@@ -57,27 +68,36 @@ export class FuncionarioService {
   }
 
   findOne(id: string): Promise<Funcionario> {
-    return this.repository.findOneBy({id});
+    return this.repository.findOneBy({ id });
   }
 
-  async updatePhoto(id: string, photo: Express.Multer.File, req: Request): Promise<Funcionario> {
+  async updatePhoto(
+    id: string,
+    photo: Express.Multer.File,
+    req: Request,
+  ): Promise<Funcionario> {
     const funcionario = await this.findOne(id);
 
-    if(!funcionario) {
-      throw new NotFoundException(`Item ${id} not found`)
+    if (!funcionario) {
+      throw new NotFoundException(`Item ${id} not found`);
     }
 
-    const url = `${req.protocol}://${req.get('host')}/files/funcionario/${photo.filename}`; 
+    const url = `${req.protocol}://${req.get('host')}/files/funcionario/${
+      photo.filename
+    }`;
     funcionario.fotoPerfil = url;
     return this.repository.save(funcionario);
   }
 
-  async update(id: string, updateFuncionarioDto: UpdateFuncionarioDto): Promise<Funcionario> {
+  async update(
+    id: string,
+    updateFuncionarioDto: UpdateFuncionarioDto,
+  ): Promise<Funcionario> {
     const funcionario = await this.repository.preload({
       id: id,
       ...updateFuncionarioDto,
     });
-    if (!funcionario){
+    if (!funcionario) {
       throw new NotFoundException(`Item ${id} not found`);
     }
     return this.repository.save(funcionario);

@@ -7,6 +7,6 @@ import { FilesPeca } from './entities/files-peca.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([FilesPeca])],
   controllers: [FilesPecaController],
-  providers: [FilesPecaService]
+  providers: [FilesPecaService],
 })
 export class FilesPecaModule {}

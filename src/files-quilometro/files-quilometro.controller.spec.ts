@@ -11,7 +11,9 @@ describe('FilesQuilometroController', () => {
       providers: [FilesQuilometroService],
     }).compile();
 
-    controller = module.get<FilesQuilometroController>(FilesQuilometroController);
+    controller = module.get<FilesQuilometroController>(
+      FilesQuilometroController,
+    );
   });
 
   it('should be defined', () => {

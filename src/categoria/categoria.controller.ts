@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { JwtAuth } from 'src/decorators/jwt.auth.decorator';
 import { Roles } from 'src/decorators/role.decorator';
@@ -14,7 +23,10 @@ export class CategoriaController {
 
   @Post()
   @Roles(Role.Admin)
-  async create(@Body() createCategoriaDto: CreateCategoriaDto, @Res({ passthrough: true }) res: Response) {
+  async create(
+    @Body() createCategoriaDto: CreateCategoriaDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.categoriaService.create(createCategoriaDto);
     res.set('location', '/categoria/' + data.id);
     return data;
@@ -34,7 +46,10 @@ export class CategoriaController {
 
   @Patch(':id')
   @Roles(Role.Admin)
-  update(@Param('id') id: string, @Body() updateCategoriaDto: UpdateCategoriaDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCategoriaDto: UpdateCategoriaDto,
+  ) {
     return this.categoriaService.update(id, updateCategoriaDto);
   }
 

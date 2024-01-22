@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+} from '@nestjs/common';
 import { UnidadeService } from './unidade.service';
 import { CreateUnidadeDto } from './dto/create-unidade.dto';
 import { UpdateUnidadeDto } from './dto/update-unidade.dto';
@@ -14,7 +23,10 @@ export class UnidadeController {
 
   @Post()
   @Roles(Role.Admin)
-  async create(@Body() createUnidadeDto: CreateUnidadeDto, @Res({ passthrough: true }) res: Response) {
+  async create(
+    @Body() createUnidadeDto: CreateUnidadeDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.unidadeService.create(createUnidadeDto);
     res.set('location', '/unidade/' + data.id);
     return data;

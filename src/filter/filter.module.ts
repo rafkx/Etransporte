@@ -1,5 +1,5 @@
-import {Global, Module} from '@nestjs/common';
-import {APP_FILTER} from '@nestjs/core';
+import { Global, Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmPostgresExceptionFilter } from './typeorm.exception.filter';
 
 @Global()
@@ -10,9 +10,7 @@ import { TypeOrmPostgresExceptionFilter } from './typeorm.exception.filter';
     {
       provide: APP_FILTER,
       useClass: TypeOrmPostgresExceptionFilter,
-    }
+    },
   ],
 })
-
-export class FilterModule {
-}
+export class FilterModule {}

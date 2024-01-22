@@ -7,7 +7,9 @@ import { Saida } from './entities/saida.entity';
 
 @Injectable()
 export class SaidaService {
-  constructor(@InjectRepository(Saida) private readonly repository: Repository<Saida>) {}
+  constructor(
+    @InjectRepository(Saida) private readonly repository: Repository<Saida>,
+  ) {}
 
   create(createSaidaDto: CreateSaidaDto) {
     const saida = this.repository.create(createSaidaDto);
@@ -23,10 +25,10 @@ export class SaidaService {
   }
 
   async update(id: string, updateSaidaDto: UpdateSaidaDto): Promise<Saida> {
-    const saida = await this.repository.preload ({
+    const saida = await this.repository.preload({
       id: id,
       ...UpdateSaidaDto,
-    })
+    });
     if (!saida) {
       throw new NotFoundException(`Item ${id} not found`);
     }

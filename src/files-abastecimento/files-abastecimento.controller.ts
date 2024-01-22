@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, Req, StreamableFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UploadedFile,
+  UseInterceptors,
+  Req,
+  StreamableFile,
+} from '@nestjs/common';
 import { FilesAbastecimentoService } from './files-abastecimento.service';
 import { CreateFilesAbastecimentoDto } from './dto/create-files-abastecimento.dto';
 import { UpdateFilesAbastecimentoDto } from './dto/update-files-abastecimento.dto';
@@ -14,26 +26,36 @@ import { FilesAbastecimento } from './entities/files-abastecimento.entity';
 @Controller('files-abastecimento')
 @JwtAuth()
 export class FilesAbastecimentoController {
-  constructor(private readonly filesAbastecimentoService: FilesAbastecimentoService) {}
+  constructor(
+    private readonly filesAbastecimentoService: FilesAbastecimentoService,
+  ) {}
 
   @Post()
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './files/abastecimento',
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = extname(file.originalname);
-        const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
-        callback(null, filename);
-      }
-    })
-  }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './files/abastecimento',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${file.originalname}-${uniqueSuffix}-${ext}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
   handleUpload(
     @UploadedFile() file: Express.Multer.File,
-    @Body() createFilesAbestecimentoDto: CreateFilesAbastecimentoDto, 
-    @Req() req: Request): Promise<FilesAbastecimento[]> {
-    return this.filesAbastecimentoService.salvarDados(file, createFilesAbestecimentoDto, req);
+    @Body() createFilesAbestecimentoDto: CreateFilesAbastecimentoDto,
+    @Req() req: Request,
+  ): Promise<FilesAbastecimento[]> {
+    return this.filesAbastecimentoService.salvarDados(
+      file,
+      createFilesAbestecimentoDto,
+      req,
+    );
   }
 
   @Get('download/:fileName')

@@ -1,8 +1,7 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateCombustivelDto {
-
-    @IsString()
-    @IsNotEmpty()
-    nome: string;
+  @IsString()
+  @IsNotEmpty()
+  nome: string;
 }

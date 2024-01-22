@@ -7,8 +7,11 @@ import { Categoria } from './entities/categoria.entity';
 
 @Injectable()
 export class CategoriaService {
-  constructor(@InjectRepository(Categoria) private readonly repository: Repository<Categoria>) {}
-  
+  constructor(
+    @InjectRepository(Categoria)
+    private readonly repository: Repository<Categoria>,
+  ) {}
+
   create(createCategoriaDto: CreateCategoriaDto) {
     const categoria = this.repository.create(createCategoriaDto);
     return this.repository.save(categoria);
@@ -19,16 +22,19 @@ export class CategoriaService {
   }
 
   findOne(id: string): Promise<Categoria> {
-    return this.repository.findOneBy({id});
+    return this.repository.findOneBy({ id });
   }
 
-  async update(id: string, updateCategoriaDto: UpdateCategoriaDto): Promise<Categoria> {
+  async update(
+    id: string,
+    updateCategoriaDto: UpdateCategoriaDto,
+  ): Promise<Categoria> {
     const categoria = await this.repository.preload({
       id: id,
       ...updateCategoriaDto,
     });
     if (!categoria) {
-      throw new NotFoundException(`Item ${id} not found`)
+      throw new NotFoundException(`Item ${id} not found`);
     }
     return this.repository.save(categoria);
   }

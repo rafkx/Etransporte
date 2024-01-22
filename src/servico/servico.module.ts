@@ -7,6 +7,6 @@ import { Servico } from './entities/servico.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Servico])],
   controllers: [ServicoController],
-  providers: [ServicoService]
+  providers: [ServicoService],
 })
 export class ServicoModule {}

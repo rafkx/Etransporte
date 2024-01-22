@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, UseInterceptors, UploadedFile, ClassSerializerInterceptor } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+  Query,
+  UseInterceptors,
+  UploadedFile,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { QuilometroService } from './quilometro.service';
 import { CreateQuilometroDto } from './dto/create-quilometro.dto';
 import { UpdateQuilometroDto } from './dto/update-quilometro.dto';
@@ -18,7 +31,10 @@ export class QuilometroController {
 
   @Post()
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  async create(@Body() createQuilometroDto: CreateQuilometroDto, @Res({ passthrough: true }) res: Response) {
+  async create(
+    @Body() createQuilometroDto: CreateQuilometroDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.quilometroService.create(createQuilometroDto);
     res.set('location', '/quilometro/' + data.id);
     return data;
@@ -27,27 +43,23 @@ export class QuilometroController {
   @Get('filter')
   @Roles(Role.Admin, Role.Gerente)
   filter(
-    @Query('data') data: any, 
+    @Query('data') data: any,
     @Query('text') text: string,
-    @Query() pageOptionsDto: PageOptionsDto
-    ) {
-    return this.quilometroService.findKmByDate(
-      data,
-      text,
-      pageOptionsDto
-    )
+    @Query() pageOptionsDto: PageOptionsDto,
+  ) {
+    return this.quilometroService.findKmByDate(data, text, pageOptionsDto);
   }
 
   @Get('paginate')
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  paginate(
-    @Query() pageOptionsDto: PageOptionsDto,
-    @AuthUser() user: Payload  
-  ) { 
+  paginate(@Query() pageOptionsDto: PageOptionsDto, @AuthUser() user: Payload) {
     if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
       return this.quilometroService.paginate(pageOptionsDto);
     } else {
-      return this.quilometroService.findQuilometroByFuncionario(user.funcionario, pageOptionsDto);
+      return this.quilometroService.findQuilometroByFuncionario(
+        user.funcionario,
+        pageOptionsDto,
+      );
     }
   }
 
@@ -66,23 +78,23 @@ export class QuilometroController {
   @Patch(':id')
   @Roles(Role.Admin, Role.User, Role.Gerente)
   update(
-    @Param('id') id: string, 
+    @Param('id') id: string,
     @Body() updateQuilometroDto: UpdateQuilometroDto,
-    @AuthUser() user: Payload,  
+    @AuthUser() user: Payload,
   ) {
     if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
       return this.quilometroService.update(id, updateQuilometroDto);
     } else {
-      return this.quilometroService.updateByUser(user.funcionario, updateQuilometroDto);
-    } 
+      return this.quilometroService.updateByUser(
+        user.funcionario,
+        updateQuilometroDto,
+      );
+    }
   }
 
   @Delete(':id')
   @Roles(Role.Admin, Role.User, Role.Gerente)
-  remove(
-    @Param('id') id: string,
-    @AuthUser() user: Payload,  
-  ) {
+  remove(@Param('id') id: string, @AuthUser() user: Payload) {
     if (user.role.includes(Role.Admin) || user.role.includes(Role.Gerente)) {
       return this.quilometroService.remove(id);
     } else {

@@ -10,31 +10,39 @@ import { join } from 'path';
 
 @Injectable()
 export class FilesPecaService {
-  constructor(@InjectRepository(FilesPeca) private readonly repository: Repository<FilesPeca>) { }
+  constructor(
+    @InjectRepository(FilesPeca)
+    private readonly repository: Repository<FilesPeca>,
+  ) {}
 
   async salvarDados(
     files: Express.Multer.File[],
     createFilesPecaDto: CreateFilesPecaDto,
-    req: Request): Promise<any> {
-      try {
-        const arrayArquivos = files?.map((file) => {
+    req: Request,
+  ): Promise<any> {
+    try {
+      const arrayArquivos = files?.map((file) => {
         const arquivo = new FilesPeca();
         arquivo.fileName = file.filename;
         arquivo.contentLenght = file.size;
         arquivo.contentType = file.mimetype;
-        arquivo.url = `${req.protocol}://${req.get('host')}/files-peca/${file.filename}`;
+        arquivo.url = `${req.protocol}://${req.get('host')}/files-peca/${
+          file.filename
+        }`;
         arquivo.peca = createFilesPecaDto?.peca;
         return arquivo;
-        });
-        await this.repository.save(arrayArquivos);
-        return {success: true};
-      } catch (e) {
-        return {sucess: false, message: e.message};
-      }
+      });
+      await this.repository.save(arrayArquivos);
+      return { success: true };
+    } catch (e) {
+      return { sucess: false, message: e.message };
+    }
   }
 
   download(fileName: string): StreamableFile {
-    const file = fs.createReadStream(join(process.cwd(), `./files/peca/${fileName}`));
+    const file = fs.createReadStream(
+      join(process.cwd(), `./files/peca/${fileName}`),
+    );
     return new StreamableFile(file);
   }
 
@@ -52,11 +60,12 @@ export class FilesPecaService {
         return erro;
       }
     });
-    const queryBuilder = this.repository.createQueryBuilder('files_pecas')
-    .delete()
-    .from('files_peca')
-    .where('files_peca.file_name = :fileName', {fileName})
-    .execute();
+    const queryBuilder = this.repository
+      .createQueryBuilder('files_pecas')
+      .delete()
+      .from('files_peca')
+      .where('files_peca.file_name = :fileName', { fileName })
+      .execute();
     return queryBuilder;
   }
 }

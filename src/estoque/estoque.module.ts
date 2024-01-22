@@ -7,6 +7,6 @@ import { Estoque } from './entities/estoque.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Estoque])],
   controllers: [EstoqueController],
-  providers: [EstoqueService]
+  providers: [EstoqueService],
 })
 export class EstoqueModule {}

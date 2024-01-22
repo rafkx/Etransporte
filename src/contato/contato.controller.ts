@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { JwtAuth } from 'src/decorators/jwt.auth.decorator';
 import { Roles } from 'src/decorators/role.decorator';
@@ -14,7 +23,10 @@ export class ContatoController {
 
   @Post()
   @Roles(Role.Admin)
-  async create(@Body() createContatoDto: CreateContatoDto, @Res({ passthrough: true }) res: Response) {
+  async create(
+    @Body() createContatoDto: CreateContatoDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.contatoService.create(createContatoDto);
     res.set('location', '/contato/' + data.id);
     return data;

@@ -7,6 +7,6 @@ import { Contato } from './entities/contato.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Contato])],
   controllers: [ContatoController],
-  providers: [ContatoService]
+  providers: [ContatoService],
 })
 export class ContatoModule {}
