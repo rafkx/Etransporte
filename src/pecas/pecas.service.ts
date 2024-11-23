@@ -1,15 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreatePecaDto } from './dto/create-peca.dto';
 import { UpdatePecaDto } from './dto/update-peca.dto';
 import { Peca } from './entities/peca.entity';
-import {
-  IPaginationOptions,
-  Pagination,
-  paginate,
-} from 'nestjs-typeorm-paginate';
-import { Observable, from, map } from 'rxjs';
 import { PageDto } from 'src/DTOs/page.dto';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
 import { PageMetaDto } from 'src/DTOs/page-meta.dto';
@@ -103,9 +97,7 @@ export class PecasService {
       throw new NotFoundException(`Item ${id} not found`);
     }
 
-    const url = `${req.protocol}://${req.get('host')}/files/peca/${
-      photo.filename
-    }`;
+    const url = `${req.protocol}://${req.get('host')}/static/${photo.filename}`;
     peca.fotoPeca = url;
     return this.repository.save(peca);
   }

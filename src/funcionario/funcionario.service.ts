@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateFuncionarioDto } from './dto/create-funcionario.dto';
@@ -11,7 +7,6 @@ import { Funcionario } from './entities/funcionario.entity';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
 import { PageDto } from 'src/DTOs/page.dto';
 import { PageMetaDto } from 'src/DTOs/page-meta.dto';
-import { Request } from 'express';
 
 @Injectable()
 export class FuncionarioService {
@@ -74,7 +69,6 @@ export class FuncionarioService {
   async updatePhoto(
     id: string,
     photo: Express.Multer.File,
-    req: Request,
   ): Promise<Funcionario> {
     const funcionario = await this.findOne(id);
 
@@ -82,9 +76,7 @@ export class FuncionarioService {
       throw new NotFoundException(`Item ${id} not found`);
     }
 
-    const url = `${req.protocol}://${req.get('host')}/files/funcionario/${
-      photo.filename
-    }`;
+    const url = `/files/funcionario/${photo.filename}`;
     funcionario.fotoPerfil = url;
     return this.repository.save(funcionario);
   }

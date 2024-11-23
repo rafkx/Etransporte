@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateVeiculoDto } from './dto/create-veiculo.dto';
 import { UpdateVeiculoDto } from './dto/update-veiculo.dto';
 import { Veiculo } from './entities/veiculo.entity';
@@ -9,7 +9,6 @@ import { PageDto } from 'src/DTOs/page.dto';
 import { PageMetaDto } from 'src/DTOs/page-meta.dto';
 import { AutorizacaoVeiculo } from 'src/autorizacao-veiculo/autorizacao-veiculo.entity';
 import { AutorizacaoVeiculoDto } from 'src/autorizacao-veiculo/dto/autorizacao-veiculo.dto';
-import { Request } from 'express';
 
 @Injectable()
 export class VeiculoService {
@@ -122,20 +121,14 @@ export class VeiculoService {
     return this.repository.findOneBy({ id });
   }
 
-  async updatePhoto(
-    id: string,
-    photo: Express.Multer.File,
-    req: Request,
-  ): Promise<Veiculo> {
+  async updatePhoto(id: string, photo: Express.Multer.File): Promise<Veiculo> {
     const veiculo = await this.findOne(id);
 
     if (!veiculo) {
       throw new NotFoundException(`Item ${id} not found`);
     }
 
-    const url = `${req.protocol}://${req.get('host')}/files/veiculo/${
-      photo.filename
-    }`;
+    const url = `/files/veiculo/${photo.filename}`;
     veiculo.fotoCarro = url;
     return this.repository.save(veiculo);
   }

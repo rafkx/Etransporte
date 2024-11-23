@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  StreamableFile,
-} from '@nestjs/common';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import { CreateFilesVeiculoDto } from './dto/create-files-veiculo.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilesVeiculo } from './entities/files-veiculo.entity';

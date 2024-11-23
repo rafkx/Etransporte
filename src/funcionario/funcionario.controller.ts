@@ -11,7 +11,7 @@ import {
   ClassSerializerInterceptor,
   UseInterceptors,
   UploadedFile,
-  Req,
+  HttpStatus,
 } from '@nestjs/common';
 import { FuncionarioService } from './funcionario.service';
 import { CreateFuncionarioDto } from './dto/create-funcionario.dto';
@@ -26,7 +26,8 @@ import { AuthUser } from 'src/auth/decorator/request.user.decorator';
 import { Payload } from 'src/DTOs/payload.dto';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { Request } from 'express';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Controller('funcionario')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -63,10 +64,44 @@ export class FuncionarioController {
   )
   async updatePhoto(
     @AuthUser() user: Payload,
-    @Req() req: Request,
     @UploadedFile() photo: Express.Multer.File,
   ): Promise<any> {
-    return this.funcionarioService.updatePhoto(user.funcionario, photo, req);
+    return this.funcionarioService.updatePhoto(user.funcionario, photo);
+  }
+
+  @Get('photo')
+  @Roles(Role.Admin, Role.Gerente, Role.User)
+  async findPhoto(@AuthUser() user: Payload, @Res() res: Response) {
+    try {
+      const funcionario = await this.funcionarioService.findOne(
+        user.funcionario,
+      );
+      const imagePath = path.join(__dirname, '../..' + funcionario.fotoPerfil);
+
+      const exists = await this.checkFilesExists(imagePath);
+      if (!exists) {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: 'Arquivo não encontrado' });
+      }
+      return res.sendFile(imagePath);
+    } catch (error) {
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: 'Ocorreu um erro ao processar a requisição' });
+    }
+  }
+
+  private async checkFilesExists(filePath: string): Promise<boolean> {
+    try {
+      const stats = await fs.promises.stat(filePath);
+      return stats.isFile();
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return false;
+      }
+      throw error;
+    }
   }
 
   @Get('filter')
@@ -88,7 +123,7 @@ export class FuncionarioController {
   }
 
   @Get(':id')
-  @Roles(Role.Admin, Role.Gerente)
+  @Roles(Role.Admin, Role.Gerente, Role.User)
   findOne(@Param('id') id: string) {
     return this.funcionarioService.findOne(id);
   }

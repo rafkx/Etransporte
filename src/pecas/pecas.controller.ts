@@ -9,7 +9,6 @@ import {
   Res,
   Query,
   UseInterceptors,
-  UploadedFiles,
   ClassSerializerInterceptor,
   Req,
   UploadedFile,
@@ -50,7 +49,7 @@ export class PecasController {
   @UseInterceptors(
     FileInterceptor('photo', {
       storage: diskStorage({
-        destination: './files/peca',
+        destination: './public',
         filename: (req, file, callback) => {
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);

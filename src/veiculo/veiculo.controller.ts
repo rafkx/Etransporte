@@ -8,28 +8,27 @@ import {
   Delete,
   Res,
   Query,
-  UploadedFiles,
   UseInterceptors,
   ClassSerializerInterceptor,
-  Req,
   UploadedFile,
+  HttpStatus,
 } from '@nestjs/common';
 import { VeiculoService } from './veiculo.service';
 import { CreateVeiculoDto } from './dto/create-veiculo.dto';
 import { UpdateVeiculoDto } from './dto/update-veiculo.dto';
-import e, { Request, Response } from 'express';
+import { Response } from 'express';
 import { JwtAuth } from 'src/decorators/jwt.auth.decorator';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
 import { PageOptionsDto } from 'src/dtos/page-options.dto';
 import { AuthUser } from 'src/auth/decorator/request.user.decorator';
-import { AuthService } from 'src/auth/auth.service';
 import { Payload } from 'src/DTOs/payload.dto';
 import { AutorizacaoVeiculoDto } from 'src/autorizacao-veiculo/dto/autorizacao-veiculo.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import * as path from 'path';
+import * as fs from 'fs';
 import { extname } from 'path';
-import { FilesVeiculo } from 'src/files-veiculo/entities/files-veiculo.entity';
 
 @Controller('veiculo')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -72,11 +71,46 @@ export class VeiculoController {
   )
   async updatePhoto(
     @Param('id') id: string,
-    @Req() req: Request,
     @UploadedFile() photo: Express.Multer.File,
   ): Promise<any> {
     console.log(photo);
-    return this.veiculoService.updatePhoto(id, photo, req);
+    return this.veiculoService.updatePhoto(id, photo);
+  }
+
+  @Get('photo/:id')
+  @Roles(Role.Admin, Role.Gerente)
+  async findPhoto(@Param('id') id: string, @Res() res: Response) {
+    try {
+      const veiculo = await this.veiculoService.findOne(id);
+      const imagePath = path.join(__dirname, '../..' + veiculo.fotoCarro);
+
+      console.log(imagePath);
+
+      const exists = await this.checkFilesExists(imagePath);
+      if (!exists) {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: 'Arquivo não encontrado' });
+      }
+      return res.sendFile(imagePath);
+    } catch (error) {
+      console.error(error);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: 'Ocorreu um erro ao processar a requisição' });
+    }
+  }
+
+  private async checkFilesExists(filePath: string): Promise<boolean> {
+    try {
+      const stats = await fs.promises.stat(filePath);
+      return stats.isFile();
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return false;
+      }
+      throw error;
+    }
   }
 
   @Get('filter')
